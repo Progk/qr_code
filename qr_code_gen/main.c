@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <math.h>
+#include "qr_table.h"
+
 
 char* convert_to_bin( int num ) //convert int to binary
 {
@@ -28,13 +31,38 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 	return str_bin;
 }
 
+int optimal_version ( int size ) //chosing optimal version
+{
+	int i;
+	int version;
+	int buffer = 0;
+
+	buffer = fabs( ( float )( size - size_of_informatin[1] ) );
+	version = 1;
+	for ( i = 2; i <= sizeof( size_of_informatin ); i++)
+		if (fabs( ( float )( size - size_of_informatin[i] ) ) < buffer)
+		{
+			buffer = fabs( ( float )( size - size_of_informatin[i] ) );
+			version = i;
+		}
+		else
+		{
+			break;
+		}
+	return version;
+}
+
+
 int main()
 {
 	char c;
+	int version;
 	char *str_source = "hello";
 	char *str_source_bin;
 	str_source_bin = convert_to_utf8( str_source );
-	printf("%s", str_source_bin);
+	version = optimal_version( strlen( str_source_bin ) );
+	printf("bin: %s\n", str_source_bin);
+	printf("version: %d", version);
 	getchar();
 
 }

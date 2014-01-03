@@ -1,4 +1,4 @@
-﻿Build started 04.01.2014 0:30:40.
+﻿Build started 04.01.2014 2:46:06.
      1>Project "D:\Sergey\C\qr_code\qr_code_gen\qr_code_gen.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\qr_code_gen.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -21,4 +21,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.37
+Time Elapsed 00:00:00.41

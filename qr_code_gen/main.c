@@ -174,7 +174,7 @@ int** create_correction_block( char **mas, int version )
 	int max;
 	int var;
 	int** correction_blocks; //corrections blocks
-	int correction;
+	int correction; //number of correction byte
 	char bin[8]; //array of byte
 	
 	correction_blocks = ( int** )calloc( number_of_blocks[version], sizeof(int*) );
@@ -189,12 +189,12 @@ int** create_correction_block( char **mas, int version )
 		else
 			max = correction;
 		correction_blocks[i] = ( int* )calloc( max + 1, sizeof( int ) );
-		correction_blocks[i][0] = max; //element 0 is size of array
+		correction_blocks[i][0] = correction; //element 0 is  correction
 		for ( j = 1; j <= number; j++) // convert each byte to int
 		{
 			strncpy( &bin[0], mas[i] + (j-1) * 8, 8 );
 			correction_blocks[i][j] = convert_to_int( &bin[0] );
-			printf("%d ", correction_blocks[i][j]);
+		//	printf("%d ", correction_blocks[i][j]);
 		}
 		
 		for ( j = 1; j <= number; j++ )
@@ -255,10 +255,10 @@ int main()
 	printf("\nblocks:");
 	for ( i = 0; i < number_of_blocks[version]; i++) //output blocks
 			printf ("\nn:%d size:%d\n%s", i, strlen(blocks[i]), blocks[i]);
-
+	printf("\n\ncorrection blocks:");
 	for ( i = 0; i < number_of_blocks[version]; i++) //output corrections blocks
 	{
-		printf ("\n\ncor_n:%d size:%d\n", i, correction_blocks[i][0] );
+		printf ("\ncor_n:%d size:%d\n", i, correction_blocks[i][0] );
 			for ( j = 1; j <= correction_blocks[i][0]; j++)
 				printf( "%d ", correction_blocks[i][j] );
 	}

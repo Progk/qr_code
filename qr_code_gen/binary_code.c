@@ -1,11 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <string.h>
-#include <malloc.h>
-#include <math.h>
-#include "qr_table.h"
-
-
+#include "binary_code.h"
 
 char* convert_to_bin( unsigned int num ) //convert int to binary
 {
@@ -158,7 +151,6 @@ char** create_blocks( char *str, int version )
 	return mas;
 }
 
-
 int** create_correction_block( char **mas, int version )
 {
 	int i;
@@ -184,7 +176,7 @@ int** create_correction_block( char **mas, int version )
 		else
 			max = correction;
 		correction_blocks[i] = ( int* )calloc( max + 1, sizeof( int ) );
-		correction_blocks[i][0] = correction; //element 0 is  correction
+		correction_blocks[i][0] = correction; //element 0 is size of correction
 		for ( j = 1; j <= number; j++) // convert each byte to int
 		{
 			strncpy( &bin[0], mas[i] + (j-1) * 8, 8 );
@@ -203,236 +195,12 @@ int** create_correction_block( char **mas, int version )
 					var = inverse_field_values[element];
 					var = ( var + polynomials[correction][k-1] )%255;
 					correction_blocks[i][k] = correction_blocks[i][k]^field_values[var];
-
 				}
+
 			}
 			
 		}
 		
 	}
 	return correction_blocks;
-}
-
-void add_finder_patterns ( char **pattern, int x, int y )
-{
-	int i;
-	int j;
-	int offset_x;
-	int offset_y;
-	for ( i = 0; i < 7; i++)
-	{
-		for ( j = 0; j < 7; j++)
-		{
-			if ( ( i == 0 ) | ( i == 6 ) )
-			{
-				pattern[x + i][y + j] = '1';
-			}
-			else if ( ( i == 1 ) | ( i == 5 ) )
-			{
-				if ( ( j == 0 ) | ( j == 6 ) )
-					pattern[x + i][y + j] = '1';
-				else
-					pattern[x + i][y + j] = '0';
-			}
-
-			else
-			{
-				if ( ( j == 1 ) | ( j == 5 ) )
-					pattern[x + i][y + j] = '0';
-				else
-					pattern[x + i][y + j] = '1';
-			}
-
-			if ( j == 6 )
-			{
-				if (( x == 4 ) & ( y == 4 ))
-				{
-					offset_x = 7;
-					offset_y = 7;
-				}
-				else if (( x == 4 ) & ( y != 4 ))
-				{
-					offset_x = 7;
-					offset_y = -1;
-				}
-				else
-				{
-					offset_x = -1;
-					offset_y = 7;
-				}
-				pattern[x + i][y + offset_y] = '0';
-				pattern[x + offset_x][y + i] = '0';
-				
-			}
-		}
-	}
-	pattern[x + offset_x][y + offset_y] = '0';
-
-}
-
-void add_aligment_patterns ( char **pattern, int version )
-{
-
-}
-
-void add_sync_line ( char **pattern, int size )
-{
-	int i;
-	//size-=8; //minus white border
-	//size-=16; //minus finder patterns
-	//size+=11;
-	for ( i = 12; i < (size-12); i++ )
-	{
-		if ( pattern[10][i] == '+' )
-			if ( i%2 == 0 )
-			{
-				pattern[10][i] = '1';
-				pattern[i][10] = '1';
-			}
-			else
-			{
-				pattern[10][i] = '0';
-				pattern[i][10] = '0';
-			}
-	}
-
-}
-
-void add_code_version ( char** patterns, int version )
-{
-
-}
-
-void add_mask ( char **pattern, int size )
-{
-	// mask is (X+Y)%2 for Medium 101010000010010
-	int i;
-	int var = 0;
-	int var2 = 0;
-	char mask[] = "101010000010010";
-	for ( i = 4; i < 12; i++ )
-	{
-		if (i != 10 ) //reserved module
-		{
-			pattern[12][i] = mask[var];
-			pattern[i][12] = mask[strlen( &mask[0] ) - 1 - var];
-			var++;
-		}
-		if ( pattern[size - i - 1][12] != '1' )
-		{
-			pattern[size - i - 1][12] = mask[var2];
-			pattern[12][size - i - 1] = mask[strlen( &mask[0] ) - 1 - var2];
-			var2++;
-		}
-		else
-		{
-			pattern[12][size - i - 1] = mask[strlen( &mask[0] ) - 1 - var2];
-			var2++;
-		}
-	}
-	pattern[12][12] = mask[7];
-
-}
-
-char** create_canvas_pattern ( char **blocks, int **cor_blocks, int version ) //pattern for image
-{
-	// + is empty
-	// 0 is white
-	// 1 is black
-	
-	int i;
-	int j;
-	int x = 4; //begins of dark array
-	int size; //size of canvas(module)
-	char **pattern; //canvas
-
-	size = ( ( ( version - 1 ) * 4 ) + 21 );
-	size+=8; //white border
-	pattern = (char**)calloc( size, sizeof(char*));
-	
-	for ( i = 0; i < size; i++)
-	{
-		pattern[i] = (char*)calloc(size, sizeof(char));
-		memset( pattern[i], (char)((int)'+'), size ); //initializing array
-
-	}
-
-	for ( i = 0; i < size; i++) //white border
-	{
-		for ( j = 0; j < size; j++)
-		{
-			if ( i < 4 )
-				pattern[i][j] = '0';
-			else if ( (j < 4) | (j > size - 5) | (i > size - 5)  )
-				pattern[i][j] = '0';
-		}
-	}
-
-	pattern[x + 4 * version + 9][x + 8] = '1'; //black module
-
-	add_finder_patterns ( pattern, x, x); //finder pattern - left top
-	
-	add_finder_patterns ( pattern, x, size - x - 7); //finder pattern - rigth top
-	
-	add_finder_patterns ( pattern, size - x - 7, x); //finder pattern - left bottom
-	
-	add_aligment_patterns ( pattern, version ); //add aligment
-	
-	add_sync_line ( pattern, size ); //add aligment
-
-	add_code_version ( pattern, version ); //add code version
-	
-	add_mask ( pattern, size ); //add mask
-
-	for ( i = 0; i < size; i++) //output pattern. for test only
-	{
-		for ( j = 0; j < size; j++)
-			printf("%c ", pattern[i][j]);
-		printf("\n");
-	}
-
-	return pattern;
-}
-
-
-
-
-int main()
-{
-	int i;
-	int j;
-	int version;
-	char *str_source = "hello";
-	char *str_source_bin;
-	char **blocks;
-	int **correction_blocks;
-	char **pattern;
-	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
-	version = optimal_version( strlen( str_source_bin ) ); //optimal version
-	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
-	blocks = create_blocks( str_source_bin, version ); //create blocks
-	correction_blocks = create_correction_block( blocks, version ); //create correction blocks
-	printf("version: %d", version);
-	printf("\nsize: %d", strlen(str_source_bin));
-	printf("\nnumber of blocks: %d", number_of_blocks[version]);
-	printf("\n\nbin full: \n%s\n", str_source_bin);
-	printf("\nblocks:");
-	//pattern = create_canvas_pattern ( blocks, correction_blocks, version );
-	for ( i = 0; i < number_of_blocks[version]; i++) //output blocks
-			printf ("\nn:%d size:%d\n%s", i, strlen(blocks[i]), blocks[i]);
-	printf("\n\ncorrection blocks:");
-	for ( i = 0; i < number_of_blocks[version]; i++) //output corrections blocks
-	{
-		printf ("\ncor_n:%d size:%d\n", i, correction_blocks[i][0] );
-			for ( j = 1; j <= correction_blocks[i][0]; j++)
-				printf( "%d ", correction_blocks[i][j] );
-	printf("\n\n");
-	pattern = create_canvas_pattern ( blocks, correction_blocks, version );
-	}
-	
-
-
-
-	getchar();
-
 }

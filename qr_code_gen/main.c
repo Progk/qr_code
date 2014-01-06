@@ -11,18 +11,18 @@ char* convert_to_bin( unsigned int num ) //convert int to binary
 {
 	int i;
 	char *str_bin;
-	if (num < 128)
-	{
+	//if (num < 128)
+	//{
 		i=7;
 		str_bin = ( char* )calloc( 8, sizeof( char )); //bin str
 		memset( str_bin, (char)((int)'0'), 8 ); //initializing array
-	}
-	else
-	{
-		i=15;
-		str_bin = ( char* )calloc( 16, sizeof( char )); //bin str
-		memset( str_bin, (char)((int)'0'), 16 ); //initializing array
-	}
+	//}
+	//else
+	//{
+	//	i=15;
+	//	str_bin = ( char* )calloc( 16, sizeof( char )); //bin str
+	//	memset( str_bin, (char)((int)'0'), 16 ); //initializing array
+	//}
 	while ( num > 0 )
 	{
 		str_bin[i] += num%2;
@@ -158,7 +158,6 @@ char** create_blocks( char *str, int version )
 	return mas;
 }
 
-
 int** create_correction_block( char **mas, int version )
 {
 	int i;
@@ -211,6 +210,55 @@ int** create_correction_block( char **mas, int version )
 		
 	}
 	return correction_blocks;
+}
+
+char* create_data ( char **blocks, int **cor_blocks, int version )
+{
+	int i;
+	int j;
+	int var = 0;
+	char *data;
+	char *buf;
+	int size;
+	int col = 0;
+	int extra_size;
+	int number = number_of_blocks[version];
+	col+=size_of_information[version];
+	col+=number_of_correction_byte[version]*8;
+	data = (char*)calloc(col, sizeof(char));
+	buf = (char*)calloc(8, sizeof(char));
+	size = (size_of_information[version] / 8) / number; //number byte in block
+	extra_size = (size_of_information[version] / 8) % number; //extra byte
+
+	for ( i = 0; i < size*8; i++) //blocks
+	{
+		for ( j = 0 ; j < number; j++)
+		{
+			data[var] = blocks[j][i];
+			var++;
+		}
+	}
+
+	for ( i = 0; i < extra_size*8; i++ ) //extra blocks
+	{
+		data[var] = blocks[number][i];
+		var++;
+	}
+
+	for ( i = 0; i < number_of_correction_byte[version]; i++) //correction
+	{
+		for ( j = 0 ; j < number; j++)
+		{
+			buf = convert_to_bin (cor_blocks[j][i+1]);
+			buf[8]='\0';
+			strcpy( &data[var], buf );
+			var+=8;
+		}
+	}
+
+	data[col] = '\0';
+	printf("%s", data );
+	return data;
 }
 
 void add_finder_patterns ( char **pattern, int x, int y )
@@ -270,7 +318,7 @@ void add_finder_patterns ( char **pattern, int x, int y )
 
 }
 
-void add_aligment_patterns ( char **pattern, int version )
+void add_aligment_patterns ( char **pattern, int version ) //add
 {
 
 }
@@ -278,9 +326,6 @@ void add_aligment_patterns ( char **pattern, int version )
 void add_sync_line ( char **pattern, int size )
 {
 	int i;
-	//size-=8; //minus white border
-	//size-=16; //minus finder patterns
-	//size+=11;
 	for ( i = 12; i < (size-12); i++ )
 	{
 		if ( pattern[10][i] == '+' )
@@ -298,7 +343,7 @@ void add_sync_line ( char **pattern, int size )
 
 }
 
-void add_code_version ( char** patterns, int version )
+void add_code_version ( char** patterns, int version ) //add
 {
 
 }
@@ -334,7 +379,82 @@ void add_mask ( char **pattern, int size )
 
 }
 
-char** create_canvas_pattern ( char **blocks, int **cor_blocks, int version ) //pattern for image
+void add_data ( char **pattern, char *data, int version)
+{
+	int i;
+	int j;
+	int k=0;
+	int kk;
+	int number = 0; //number of empty blocks
+	int size = ( ( ( version - 1 ) * 4 ) + 21 ); //size of canvas
+	int var = 0;
+	int x = size + 3; //next X coord
+	int off_y_up = size + 3; //offset y up
+	int off_y_down = 4; //offset Y down
+	//pattern[4][4] = 'm';
+	//pattern[y][y] = 'm';
+	for ( i = 4; i <= ( size + 4 ); i++ ) //counting empty elements
+		for ( j = 4; j <= ( size + 4 ); j++ )
+			if ( pattern[i][j] == '+' )
+				number++;
+
+	for ( i = 0; i < (size-1); i+=2 )
+	{
+		if ( ( x - i ) == 10 )
+			x--;
+		for ( j = 0; j < size; j++ )
+		{
+			if ( i%2 == 0 )
+			{
+				if ( pattern[off_y_up - j][x - i] == '+' )
+				{
+					pattern[off_y_up - j][x - i] = data[var];
+					var++;
+					number--;
+				}
+				if ( pattern[off_y_up - j][x - i - 1] == '+' )
+				{
+					pattern[off_y_up - j][x - i - 1] = data[var];
+					var++;
+					number--;
+				}
+				
+			}
+			else
+			{
+				if ( pattern[off_y_down + j][x - i*2] == '+' )
+				{
+					pattern[off_y_down + j][x - i*2] = data[var];
+					var++;
+					number--;
+				}
+				if ( pattern[off_y_down + j][x - i*2 - 1] == '+' )
+				{
+					pattern[off_y_down + j][x - i*2 - 1] = data[var];
+					var++;
+					number--;
+				}
+			}
+
+
+			/*for ( k = 0; k < size+8; k++) //output pattern. for test only
+				{
+				for ( kk = 0; kk < size+8; kk++)
+					printf("%c ", pattern[k][kk]);
+				printf("\n");
+				}
+			*/
+
+		}
+	}
+
+
+
+	printf ( "empty: %d\n", number );
+
+}
+
+char** create_canvas_pattern ( char *data, int version ) //pattern for image
 {
 	// + is empty
 	// 0 is white
@@ -384,6 +504,8 @@ char** create_canvas_pattern ( char **blocks, int **cor_blocks, int version ) //
 	
 	add_mask ( pattern, size ); //add mask
 
+	add_data ( pattern, data, version); //add data
+
 	for ( i = 0; i < size; i++) //output pattern. for test only
 	{
 		for ( j = 0; j < size; j++)
@@ -394,7 +516,10 @@ char** create_canvas_pattern ( char **blocks, int **cor_blocks, int version ) //
 	return pattern;
 }
 
+void create_bmp ( char **pattern, int version )
+{
 
+}
 
 
 int main()
@@ -402,11 +527,12 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "hello";
+	char *str_source = "hello world";
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
 	char **pattern;
+	char *data;
 	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
 	version = optimal_version( strlen( str_source_bin ) ); //optimal version
 	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
@@ -426,9 +552,11 @@ int main()
 		printf ("\ncor_n:%d size:%d\n", i, correction_blocks[i][0] );
 			for ( j = 1; j <= correction_blocks[i][0]; j++)
 				printf( "%d ", correction_blocks[i][j] );
-	printf("\n\n");
-	pattern = create_canvas_pattern ( blocks, correction_blocks, version );
 	}
+	printf("\n\n");
+	data = create_data ( blocks, correction_blocks, version );
+	pattern = create_canvas_pattern ( data, version );
+	
 	
 
 

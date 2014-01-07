@@ -20,3 +20,29 @@
 #Visual Studio
 *.sdf
 *.opensdf
+ipch/
+*.aps
+*.ncb
+*.cachefile
+Thumbs.db
+*.cache
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# User
+*.bmp
+
+

@@ -1,7 +1,9 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#define PIXEL_PER_MODUL 3
+#define _CRT_SECURE_NO_WARNINGS
+
+#define PIXEL_PER_MODUL 10
 
 #include <stdio.h>
 #include <string.h>
@@ -35,9 +37,10 @@ typedef struct
 }bmp_file_header;
 #pragma pack(pop)
 
+
 void create_header ( bmp_file_header *bmp, int version );
 
-void create_bmp ( char **pattern, int version );
+void create_bmp ( char **pattern, char *name, int version );
 
 
 

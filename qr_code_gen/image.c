@@ -3,54 +3,103 @@
 void create_header ( bmp_file_header *bmp, int version )
 {
 	DWORD size;
+	int offset = 0;
+	size = ( ( ( version - 1 ) * 4 ) + 21 );
+	size+=8; //white border
+	size*=PIXEL_PER_MODUL;
+	size*=3;
+
+	if ( size%4 != 0 )
+		offset = size%4;
 
 	bmp->signature = 0x4D42;
-	bmp->size = size_of_information[version]/8 + number_of_correction_byte[version];
+	bmp->size = ( size + offset ) * (size/3) + 54;
 	bmp->free1 = 0;
 	bmp->free2 = 0;
 	bmp->image_data = 54;
 
-
 	bmp->header_length = 40;
-	bmp->image_width = ( ( ( ( version - 1 ) * 4 ) + 21 ) + 8) * PIXEL_PER_MODUL/3; //test
+	bmp->image_width = ( ( ( ( version - 1 ) * 4 ) + 21 ) + 8) * PIXEL_PER_MODUL; //test
 	bmp->image_height = bmp->image_width;
 	bmp->image_planes = 1;
-	bmp->bit_per_pixel = 1;
+	bmp->bit_per_pixel = 24; //24
 	bmp->image_compression = 0;
-	bmp->image_data_length = 841; //test
-	bmp->hor_res = bmp->image_width;
-	bmp->vert_res = bmp->image_width;
-	bmp->image_number_colors = 0; //test
-	bmp->image_important_colors = 0; //test
+	bmp->image_data_length = bmp->size - 54;
+	bmp->hor_res = 0;
+	bmp->vert_res = 0;
+	bmp->image_number_colors = 0;
+	bmp->image_important_colors = 0;
 }
 
-void create_bmp ( char **pattern, int version )
+void create_bmp ( char **pattern, char *name, int version )
 {
 	FILE *f;
 	bmp_file_header bmp;
-	int size;
+	char *data;
+	char *buffer;
+	char *black;
+	char *white;
+	int number; //number elements in column
+	int size; //size string in bmp image
 	int i;
 	int j;
-	create_header ( &bmp, version );
-	f = fopen( "test.bmp", "wb" );
-	fwrite( &bmp, sizeof(bmp), 1, f);
-	for ( i = 0; i < number_of_correction_byte[version]; i++ )
+	int k;
+	int var = 0;
+	int var2 = 0;
+
+	number = ( ( ( version - 1 ) * 4 ) + 21 );
+	number+=8; //white border
+
+	size = ( ( ( version - 1 ) * 4 ) + 21 );
+	size+=8; //white border
+	size*=PIXEL_PER_MODUL;
+	size*=3;
+
+	if ( size%4 != 0 )
+		size += size%4;
+
+	create_header ( &bmp, version ); //create header
+	
+	black = (char*)calloc(3, sizeof(char));
+	white =(char*)calloc(3, sizeof(char));
+	memset( white, 255, 3 );
+	data = (char*)calloc( bmp.image_data_length, sizeof(char) );
+	buffer = (char*)calloc( size, sizeof(char) );
+	
+	var2 = bmp.image_data_length;
+	var2-=size;
+
+	for ( i = 0; i < number; i++ )
 	{
-		for ( j = 0;j < strlen( pattern[i] ); j++ )
+		var = 0;
+		for ( j = 0; j < number; j++ )
 		{
 			if ( pattern[i][j] == '0' )
-				pattern[i][j] = 255;
+			{
+				for ( k = 0; k < PIXEL_PER_MODUL; k++ )
+				{
+				memcpy ( &buffer[var], white, 3 );
+				var+=3;
+				}
+			}
 			else
-				pattern[i][j] = 0;
+			{
+				for ( k = 0; k < PIXEL_PER_MODUL; k++ )
+				{
+				memcpy ( &buffer[var], black, 3 );
+				var+=3;
+				}
+			}
+		}
+		for ( k = 0; k < PIXEL_PER_MODUL; k++ )
+		{
+			memcpy ( &data[var2], buffer, size ); //add to end of array
+			var2-=size;
 		}
 	}
-	for ( i = 0; i < number_of_correction_byte[version]; i++ )
-	{
-		if ( strlen( pattern[i] )%4 != 0)
-			fwrite ( pattern[i], strlen( pattern[i] ) + strlen( pattern[i] )%4, 1, f );
-		else
-			fwrite ( pattern[i], strlen( pattern[i] ), 1, f );
-	}
-	fwrite( &bmp, sizeof(bmp), 1, f);
+
+	f = fopen( "test.bmp", "wb" );
+	fwrite( &bmp, sizeof(bmp), 1, f );
+	fwrite( data, bmp.image_data_length, 1, f );
 	fclose(f);
 }

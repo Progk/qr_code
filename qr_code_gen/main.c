@@ -13,7 +13,7 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "hello world";
+	char *str_source = "hello";
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
@@ -42,7 +42,7 @@ int main()
 	printf("\n\n");
 	data = create_data ( blocks, correction_blocks, version );
 	pattern = create_canvas_pattern ( data, version );
-	//create_bmp( pattern, version );
+	create_bmp( pattern, "my", version );
 	
 	
 

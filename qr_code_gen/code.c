@@ -161,7 +161,6 @@ int** create_correction_block( char **mas, int version )
 	int i;
 	int j;
 	int k;
-	int z;
 	int element; //first element array
 	int number; //number byte in blocks
 	int max;
@@ -383,8 +382,6 @@ void add_data ( char **pattern, char *data, int version)
 {
 	int i;
 	int j;
-	int k=0;
-	int kk;
 	int number = 0; //number of empty blocks
 	int size = ( ( ( version - 1 ) * 4 ) + 21 ); //size of canvas
 	int var = 0;
@@ -498,7 +495,7 @@ char** create_canvas_pattern ( char *data, int version ) //pattern for image
 	
 	add_aligment_patterns ( pattern, version ); //add aligment
 	
-	add_sync_line ( pattern, size ); //add aligment
+	add_sync_line ( pattern, size ); //add sync line
 
 	add_code_version ( pattern, version ); //add code version
 	

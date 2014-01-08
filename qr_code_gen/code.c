@@ -98,26 +98,29 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 
 	zero = (strlen( str ) + data )%8; //number of zero until str%8 != 0
 	zero_str = (char*)calloc( zero, sizeof(char));
+	zero_str[zero] = '\0';
 	memset( zero_str, (char)((int)'0'), zero ); //initializing array
 
 	buffer = (strlen( str ) + data + zero - size_of_information[*ver]);
-	extra = ( int )ceil(fabs( buffer/8. )); //number of extra byte
+	if ( buffer < 0 )
+		extra = -buffer/8; //number of extra byte
 
 	str_full = ( char* )calloc( strlen( str ) + data + zero + extra*8, sizeof(char) ); //new str full
+	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
 	strcpy(&str_full[4], convert_to_bin(strlen( str )/8)); //add size of data
 	strcpy(&str_full[data], str); //add data(bit)
 	strcpy(&str_full[data + strlen(str)], zero_str); //add zero
-
+	strlen(str_full);
 	for (i = 0; i < extra; i++) //add extra byte
 	{
-		if (i%2 == 0)
+		if (i%2 == 1)
 			strcpy(&str_full[data + strlen(str) + zero + i*8], "11101100");
 		else
 			strcpy(&str_full[data + strlen(str) + zero + i*8], "00010001");
 	}
 
-	free(zero_str);
+	//free(zero_str);
 	return str_full;
 }
 
@@ -180,11 +183,12 @@ int** create_correction_block( char **mas, int version )
 		else
 			max = correction;
 		correction_blocks[i] = ( int* )calloc( max + 1, sizeof( int ) );
-		correction_blocks[i][0] = correction; //element 0 is  correction
+		correction_blocks[i][0] = correction; //element 0 is  correction size
 		for ( j = 1; j <= number; j++) // convert each byte to int
 		{
 			strncpy( &bin[0], mas[i] + (j-1) * 8, 8 );
 			correction_blocks[i][j] = convert_to_int( &bin[0] );
+			printf("%d ", correction_blocks[i][j] );
 		}
 		
 		for ( j = 1; j <= number; j++ )
@@ -194,10 +198,12 @@ int** create_correction_block( char **mas, int version )
 			correction_blocks[i][max] = 0; //last element = 0
 			if ( element != 0 )
 			{
-				for ( k = 1; k <= (max); k++)
+				for ( k = 1; k <= correction; k++)
 				{
 					var = inverse_field_values[element];
-					var = ( var + polynomials[correction][k-1] )%255;
+					var = var + polynomials[correction][k-1];
+					if ( var > 254 )
+						var = var%255;
 					correction_blocks[i][k] = correction_blocks[i][k]^field_values[var];
 
 				}
@@ -227,17 +233,30 @@ char* create_data ( char **blocks, int **cor_blocks, int version )
 	buf = (char*)calloc(8, sizeof(char));
 	size = (size_of_information[version] / 8) / number; //number byte in block
 	extra_size = (size_of_information[version] / 8) % number; //extra byte
-
-	for ( i = 0; i < size*8; i++) //blocks
+	
+	/*cor_blocks[0][0] = 10;
+	cor_blocks[0][1] = 74;
+	cor_blocks[0][2] = 243;
+	cor_blocks[0][3] = 44;
+	cor_blocks[0][4] = 125;
+	cor_blocks[0][5] = 176;
+	cor_blocks[0][6] = 84;
+	cor_blocks[0][7] = 135;
+	cor_blocks[0][8] = 226;
+	cor_blocks[0][9] = 213;
+	cor_blocks[0][10] = 155;*/
+	
+	for ( i = 0; i < size; i++) //blocks
 	{
 		for ( j = 0 ; j < number; j++)
 		{
-			data[var] = blocks[j][i];
-			var++;
+			memcpy ( &data[var], &blocks[j][i*8], 8 );
+			//data[var] = blocks[j][i];
+			var+=8;
 		}
 	}
 
-	for ( i = 0; i < extra_size*8; i++ ) //extra blocks
+	for ( i = 0; i < extra_size*8; i++ ) //extra blocks!!!!!!!!!!!!!!!!!!!!
 	{
 		data[var] = blocks[number][i];
 		var++;
@@ -385,6 +404,8 @@ void add_data ( char **pattern, char *data, int version)
 	int number = 0; //number of empty blocks
 	int size = ( ( ( version - 1 ) * 4 ) + 21 ); //size of canvas
 	int var = 0;
+	int k;
+	int kk;
 	int x = size + 3; //next X coord
 	int off_y_up = size + 3; //offset y up
 	int off_y_down = 4; //offset Y down
@@ -395,23 +416,23 @@ void add_data ( char **pattern, char *data, int version)
 			if ( pattern[i][j] == '+' )
 				number++;
 
-	for ( i = 0; i < (size-1); i+=2 )
+	for ( i = 0; i < (size-1)/2; i++ )
 	{
-		if ( ( x - i ) == 10 )
+		if ( ( x - i*2 ) == 10 )
 			x--;
 		for ( j = 0; j < size; j++ )
 		{
 			if ( i%2 == 0 )
 			{
-				if ( pattern[off_y_up - j][x - i] == '+' )
+				if ( pattern[off_y_up - j][x - i*2] == '+' )
 				{
-					pattern[off_y_up - j][x - i] = data[var];
+					pattern[off_y_up - j][x - i*2] = data[var];
 					var++;
 					number--;
 				}
-				if ( pattern[off_y_up - j][x - i - 1] == '+' )
+				if ( pattern[off_y_up - j][x - i*2 - 1] == '+' )
 				{
-					pattern[off_y_up - j][x - i - 1] = data[var];
+					pattern[off_y_up - j][x - i*2 - 1] = data[var];
 					var++;
 					number--;
 				}

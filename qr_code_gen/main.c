@@ -13,13 +13,14 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "hello";
+	char *str_source = "hello world";
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
 	char **pattern;
 	char *data;
 	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
+	printf("source: \n%s\n\n", str_source_bin );
 	version = optimal_version( strlen( str_source_bin ) ); //optimal version
 	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
 	blocks = create_blocks( str_source_bin, version ); //create blocks

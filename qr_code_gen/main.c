@@ -13,7 +13,7 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "hello world";
+	char *str_source = "qwertyuiopasdf"; //for now only 14 symbols works properly
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
@@ -25,14 +25,14 @@ int main()
 	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
 	blocks = create_blocks( str_source_bin, version ); //create blocks
 	correction_blocks = create_correction_block( blocks, version ); //create correction blocks
-	printf("version: %d", version);
+	printf("\nversion: %d", version);
 	printf("\nsize: %d", strlen(str_source_bin));
 	printf("\nnumber of blocks: %d", number_of_blocks[version]);
 	printf("\n\nbin full: \n%s\n", str_source_bin);
 	printf("\nblocks:");
 	//pattern = create_canvas_pattern ( blocks, correction_blocks, version );
 	for ( i = 0; i < number_of_blocks[version]; i++) //output blocks
-			printf ("\nn:%d size:%d\n%s", i, strlen(blocks[i]), blocks[i]);
+			printf ("\nn:%d size:%d\n%s ", i, strlen(blocks[i]), blocks[i]);
 	printf("\n\ncorrection blocks:");
 	for ( i = 0; i < number_of_blocks[version]; i++) //output corrections blocks
 	{

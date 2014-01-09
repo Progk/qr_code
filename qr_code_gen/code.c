@@ -74,7 +74,7 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 {
 	int data = 4; //service data (bit) = coding method(4 bit) + size of data(8 or 16 bit) 
 	int zero;
-	int extra; //extra byte
+	int extra = 0; //extra byte
 	int buffer;
 	int i;
 	char *str_full;
@@ -109,12 +109,13 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
 	strcpy(&str_full[4], convert_to_bin(strlen( str )/8)); //add size of data
+	//strcpy(&str_full[4], convert_to_bin(sizeof(*str))); //add size of data
 	strcpy(&str_full[data], str); //add data(bit)
 	strcpy(&str_full[data + strlen(str)], zero_str); //add zero
 	strlen(str_full);
 	for (i = 0; i < extra; i++) //add extra byte
 	{
-		if (i%2 == 1)
+		if (i%2 == 0)
 			strcpy(&str_full[data + strlen(str) + zero + i*8], "11101100");
 		else
 			strcpy(&str_full[data + strlen(str) + zero + i*8], "00010001");
@@ -159,7 +160,7 @@ char** create_blocks( char *str, int version )
 }
 
 
-int** create_correction_block( char **mas, int version )
+int** create_correction_block( char **mas, int version ) //fix
 {
 	int i;
 	int j;
@@ -216,7 +217,7 @@ int** create_correction_block( char **mas, int version )
 }
 
 
-char* create_data ( char **blocks, int **cor_blocks, int version )
+char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 {
 	int i;
 	int j;
@@ -234,17 +235,6 @@ char* create_data ( char **blocks, int **cor_blocks, int version )
 	size = (size_of_information[version] / 8) / number; //number byte in block
 	extra_size = (size_of_information[version] / 8) % number; //extra byte
 	
-	/*cor_blocks[0][0] = 10;
-	cor_blocks[0][1] = 74;
-	cor_blocks[0][2] = 243;
-	cor_blocks[0][3] = 44;
-	cor_blocks[0][4] = 125;
-	cor_blocks[0][5] = 176;
-	cor_blocks[0][6] = 84;
-	cor_blocks[0][7] = 135;
-	cor_blocks[0][8] = 226;
-	cor_blocks[0][9] = 213;
-	cor_blocks[0][10] = 155;*/
 	
 	for ( i = 0; i < size; i++) //blocks
 	{
@@ -256,10 +246,11 @@ char* create_data ( char **blocks, int **cor_blocks, int version )
 		}
 	}
 
-	for ( i = 0; i < extra_size*8; i++ ) //extra blocks!!!!!!!!!!!!!!!!!!!!
+	for ( i = 0; i < extra_size; i++ ) //extra blocks
 	{
 		data[var] = blocks[number][i];
-		var++;
+		memcpy ( &data[var], &blocks[number][i*8], 8 );
+		var+=8;
 	}
 
 	for ( i = 0; i < number_of_correction_byte[version]; i++) //correction
@@ -409,8 +400,6 @@ void add_data ( char **pattern, char *data, int version)
 	int x = size + 3; //next X coord
 	int off_y_up = size + 3; //offset y up
 	int off_y_down = 4; //offset Y down
-	//pattern[4][4] = 'm';
-	//pattern[y][y] = 'm';
 	for ( i = 4; i <= ( size + 4 ); i++ ) //counting empty elements
 		for ( j = 4; j <= ( size + 4 ); j++ )
 			if ( pattern[i][j] == '+' )
@@ -426,32 +415,73 @@ void add_data ( char **pattern, char *data, int version)
 			{
 				if ( pattern[off_y_up - j][x - i*2] == '+' )
 				{
+					if ( (off_y_up - j + x - i*2)%2 == 0 )
+					{
+						if ( data[var] == '1' )
+							pattern[off_y_up - j][x - i*2] = '0';
+						else
+							pattern[off_y_up - j][x - i*2] = '1';
+					}
+					else
+					{
 					pattern[off_y_up - j][x - i*2] = data[var];
+					}
 					var++;
 					number--;
-				}
+				 }
+
 				if ( pattern[off_y_up - j][x - i*2 - 1] == '+' )
 				{
+					if ( (off_y_up - j + x - i*2 - 1)%2 == 0 )
+					{
+						if ( data[var] == '1' )
+							pattern[off_y_up - j][x - i*2 - 1] = '0';
+						else
+							pattern[off_y_up - j][x - i*2 - 1] = '1';
+					}
+					else
+					{
 					pattern[off_y_up - j][x - i*2 - 1] = data[var];
+					}
 					var++;
 					number--;
-				}
-				
+				 }		
 			}
 			else
 			{
 				if ( pattern[off_y_down + j][x - i*2] == '+' )
 				{
+					if ( (off_y_down + j + x - i*2)%2 == 0 )
+					{
+						if ( data[var] == '1' )
+							pattern[off_y_down + j][x - i*2] = '0';
+						else
+							pattern[off_y_down + j][x - i*2] = '1';
+					}
+					else
+					{
 					pattern[off_y_down + j][x - i*2] = data[var];
+					}
 					var++;
 					number--;
-				}
+				 }
+
 				if ( pattern[off_y_down + j][x - i*2 - 1] == '+' )
 				{
+					if ( (off_y_down + j + x - i*2 - 1)%2 == 0 )
+					{
+						if ( data[var] == '1' )
+							pattern[off_y_down + j][x - i*2 - 1] = '0';
+						else
+							pattern[off_y_down + j][x - i*2 - 1] = '1';
+					}
+					else
+					{
 					pattern[off_y_down + j][x - i*2 - 1] = data[var];
+					}
 					var++;
 					number--;
-				}
+				 }
 			}
 
 
@@ -460,8 +490,8 @@ void add_data ( char **pattern, char *data, int version)
 				for ( kk = 0; kk < size+8; kk++)
 					printf("%c ", pattern[k][kk]);
 				printf("\n");
-				}
-			*/
+				}*/
+			
 
 		}
 	}
@@ -524,6 +554,7 @@ char** create_canvas_pattern ( char *data, int version ) //pattern for image
 
 	add_data ( pattern, data, version); //add data
 
+	printf("\n");
 	for ( i = 0; i < size; i++) //output pattern. for test only
 	{
 		for ( j = 0; j < size; j++)

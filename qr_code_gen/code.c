@@ -4,8 +4,8 @@ char* convert_to_bin( unsigned int num, unsigned int bit ) //convert int to bina
 {
 	char *str_bin;
 
-	str_bin = ( char* )calloc( bit, sizeof( char )); //bin str
-	memset( str_bin, (char)((int)'0'), bit ); //initializing array
+	str_bin = ( char* )calloc( bit, sizeof( char ) ); //bin str
+	memset( str_bin, ( char )( ( int )'0' ), bit ); //initializing array
 	
 	bit--;
 	while ( num > 0 )
@@ -23,8 +23,10 @@ int convert_to_int( char* str )
 {
 	int sum = 0;
 	int i;
+
 	for ( i = 0; i < 8; i++)
-		sum+= (int)((str[7-i] - 48) * pow( 2., i ));
+		sum+= ( int )( ( str[7-i] - 48 ) * pow( 2., i ) );
+
 	return sum;
 
 }
@@ -33,10 +35,14 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 {
 	int i;
 	char *str_bin;
-	str_bin = ( char* )calloc( strlen( str ) * 8 + 1, sizeof( char )); //for bin str
+
+	str_bin = ( char* )calloc( strlen( str ) * 8 + 1, sizeof( char ) ); //for bin str
+
 	for ( i = 0; i < strlen( str ); i++ )
-		memcpy( str_bin + i*8, convert_to_bin( str[i], 8 ), 8 * sizeof( char )); //copy binary code
-	str_bin[ strlen( str ) * 8 + 1 ] = '\0'; //add end of str
+		memcpy( str_bin + i*8, convert_to_bin( str[i], 8 ), 8 * sizeof( char ) ); //copy binary code
+	
+	str_bin[strlen( str ) * 8 + 1] = '\0'; //end of string
+
 	return str_bin;
 }
 
@@ -49,6 +55,7 @@ int optimal_version ( int size ) //chosing optimal version
 
 	buffer = ( int )fabs( ( float )( size - size_of_information[1] ) );
 	version = 1;
+
 	for ( i = 2; i <= sizeof( size_of_information ); i++ )
 		if (fabs( ( float )( size - size_of_information[i] ) ) < buffer )
 		{
@@ -59,6 +66,7 @@ int optimal_version ( int size ) //chosing optimal version
 		{
 			break;
 		}
+
 	return version;
 }
 
@@ -73,28 +81,27 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	char *str_full;
 	char *zero_str;
 
-	if (*ver <= 9) //length of data field
+	if ( *ver <= 9 ) //length of data field
 		data+=8;
 	else 
 		data+=16;
 
 	if ( ( strlen( str ) + data ) > ( size_of_information[*ver] ) ) //if big size
 	{
-		(*ver)++;
+		( *ver )++;
 		data = 4;
-		if (*ver <= 9) //length of data field again, because version changed
+		if ( *ver <= 9 ) //length of data field again, because version changed
 			data+=8;
 		else 
 			data+=16;
 	}
 
-
 	zero = (strlen( str ) + data )%8; //number of zero until str%8 != 0
-	zero_str = (char*)calloc( zero, sizeof(char));
+	zero_str = ( char* )calloc( zero, sizeof( char ) );
 	zero_str[zero] = '\0';
-	memset( zero_str, (char)((int)'0'), zero ); //initializing array
+	memset( zero_str, ( char )((int)'0'), zero ); //initializing array
 
-	buffer = (strlen( str ) + data + zero - size_of_information[*ver]);
+	buffer = ( strlen( str ) + data + zero - size_of_information[*ver] );
 	if ( buffer < 0 )
 		extra = -buffer/8; //number of extra byte
 
@@ -102,10 +109,10 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
 	strcpy(&str_full[4], convert_to_bin(strlen( str ) / 8, data - 4 )); //add size of data
-	//strcpy(&str_full[4], convert_to_bin(sizeof(*str))); //add size of data
 	strcpy(&str_full[data], str); //add data(bit)
 	strcpy(&str_full[data + strlen(str)], zero_str); //add zero
 	strlen(str_full);
+
 	for (i = 0; i < extra; i++) //add extra byte
 	{
 		if (i%2 == 0)
@@ -114,7 +121,6 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 			strcpy(&str_full[data + strlen(str) + zero + i*8], "00010001");
 	}
 
-	//free(zero_str);
 	return str_full;
 }
 
@@ -127,12 +133,14 @@ char** create_blocks( char *str, int version )
 	int extra_size; //extra bit
 	int number = number_of_blocks[version]; //number of blocks
 	int element = 0; //pointer to starting copy of string
-	size = (size_of_information[version] / 8) / number; //number byte in block
-	extra_size = (size_of_information[version] / 8) % number; //extra byte
+	
+	size = ( size_of_information[version] / 8 ) / number; //number byte in block
+	extra_size = ( size_of_information[version] / 8 ) % number; //extra byte
 	mas = ( char** )calloc( number, sizeof(char*) );
+	
 	for ( i = 0; i < number; i++ )
 	{
-		if ( (i + extra_size)!=number )
+		if ( ( i + extra_size ) != number )
 		{
 			mas[i] = ( char* )calloc( size * 8 , sizeof(char) ); //without extra size
 			memcpy( mas[i], &str[element], size * 8); 
@@ -221,6 +229,7 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	int col = 0;
 	int extra_size;
 	int number = number_of_blocks[version];
+
 	col+=size_of_information[version];
 	col+=number_of_correction_byte[version]*8;
 	data = (char*)calloc(col, sizeof(char));
@@ -228,13 +237,11 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	size = (size_of_information[version] / 8) / number; //number byte in block
 	extra_size = (size_of_information[version] / 8) % number; //extra byte
 	
-	
 	for ( i = 0; i < size; i++) //blocks
 	{
 		for ( j = 0 ; j < number; j++)
 		{
 			memcpy ( &data[var], &blocks[j][i*8], 8 );
-			//data[var] = blocks[j][i];
 			var+=8;
 		}
 	}
@@ -251,15 +258,13 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 		for ( j = 0 ; j < number; j++)
 		{
 			buf = convert_to_bin ( cor_blocks[j][i+1], 8 );
-			//buf[8]='\0';
-			//strcpy( &data[var], buf );
 			memcpy( &data[var], buf, 8 );
 			var+=8;
 		}
 	}
 
 	data[col] = '\0';
-	printf("%s", data );
+	printf( "%s", data );
 	return data;
 }
 
@@ -417,6 +422,7 @@ void add_code_version ( char** pattern, int version ) //add
 {
 	int i;
 	int x = 4; //beginning of dark array
+
 	for ( i = 0; i < 6; i++ )
 	{
 		pattern[x + 4 * version + 6][x+i] = code_version[version][i]; //top
@@ -437,6 +443,7 @@ void add_mask ( char **pattern, int size )
 	int var = 0;
 	int var2 = 0;
 	char mask[] = "101010000010010";
+	
 	for ( i = 4; i < 12; i++ )
 	{
 		if (i != 10 ) //reserved module
@@ -445,6 +452,7 @@ void add_mask ( char **pattern, int size )
 			pattern[i][12] = mask[strlen( &mask[0] ) - 1 - var];
 			var++;
 		}
+
 		if ( pattern[size - i - 1][12] != '1' )
 		{
 			pattern[size - i - 1][12] = mask[var2];
@@ -457,6 +465,7 @@ void add_mask ( char **pattern, int size )
 			var2++;
 		}
 	}
+
 	pattern[12][12] = mask[7];
 
 }
@@ -468,11 +477,10 @@ void add_data ( char **pattern, char *data, int version)
 	int number = 0; //number of empty blocks
 	int size = ( ( ( version - 1 ) * 4 ) + 21 ); //size of canvas
 	int var = 0;
-	int k;
-	int kk;
 	int x = size + 3; //next X coord
 	int off_y_up = size + 3; //offset y up
 	int off_y_down = 4; //offset Y down
+	
 	for ( i = 4; i <= ( size + 4 ); i++ ) //counting empty elements
 		for ( j = 4; j <= ( size + 4 ); j++ )
 			if ( pattern[i][j] == '+' )
@@ -486,26 +494,26 @@ void add_data ( char **pattern, char *data, int version)
 		{
 			if ( i%2 == 0 )
 			{
-				if ( pattern[off_y_up - j][x - i*2] == '+' )
+				if ( pattern[off_y_up - j][x - i * 2] == '+' )
 				{
-					if ( (off_y_up - j + x - i*2)%2 == 0 )
+					if ( ( off_y_up - j + x - i * 2 ) % 2 == 0 )
 					{
 						if ( data[var] == '1' )
-							pattern[off_y_up - j][x - i*2] = '0';
+							pattern[off_y_up - j][x - i * 2] = '0';
 						else
-							pattern[off_y_up - j][x - i*2] = '1';
+							pattern[off_y_up - j][x - i * 2] = '1';
 					}
 					else
 					{
-					pattern[off_y_up - j][x - i*2] = data[var];
+					pattern[off_y_up - j][x - i * 2] = data[var];
 					}
 					var++;
 					number--;
 				 }
 
-				if ( pattern[off_y_up - j][x - i*2 - 1] == '+' )
+				if ( pattern[off_y_up - j][x - i * 2 - 1] == '+' )
 				{
-					if ( (off_y_up - j + x - i*2 - 1)%2 == 0 )
+					if ( ( off_y_up - j + x - i * 2 - 1 ) % 2 == 0 )
 					{
 						if ( data[var] == '1' )
 							pattern[off_y_up - j][x - i*2 - 1] = '0';
@@ -522,56 +530,46 @@ void add_data ( char **pattern, char *data, int version)
 			}
 			else
 			{
-				if ( pattern[off_y_down + j][x - i*2] == '+' )
+				if ( pattern[off_y_down + j][x - i * 2] == '+' )
 				{
-					if ( (off_y_down + j + x - i*2)%2 == 0 )
+					if ( (off_y_down + j + x - i * 2)%2 == 0 )
 					{
 						if ( data[var] == '1' )
-							pattern[off_y_down + j][x - i*2] = '0';
+							pattern[off_y_down + j][x - i * 2] = '0';
 						else
-							pattern[off_y_down + j][x - i*2] = '1';
+							pattern[off_y_down + j][x - i * 2] = '1';
 					}
 					else
 					{
-					pattern[off_y_down + j][x - i*2] = data[var];
+					pattern[off_y_down + j][x - i * 2] = data[var];
 					}
 					var++;
 					number--;
 				 }
 
-				if ( pattern[off_y_down + j][x - i*2 - 1] == '+' )
+				if ( pattern[off_y_down + j][x - i * 2 - 1] == '+' )
 				{
-					if ( (off_y_down + j + x - i*2 - 1)%2 == 0 )
+					if ( (off_y_down + j + x - i * 2 - 1) % 2 == 0 )
 					{
 						if ( data[var] == '1' )
-							pattern[off_y_down + j][x - i*2 - 1] = '0';
+							pattern[off_y_down + j][x - i * 2 - 1] = '0';
 						else
-							pattern[off_y_down + j][x - i*2 - 1] = '1';
+							pattern[off_y_down + j][x - i * 2 - 1] = '1';
 					}
 					else
 					{
-					pattern[off_y_down + j][x - i*2 - 1] = data[var];
+					pattern[off_y_down + j][x - i * 2 - 1] = data[var];
 					}
 					var++;
 					number--;
 				 }
 			}
-
-
-			/*for ( k = 0; k < size+8; k++) //output pattern. for test only
-				{
-				for ( kk = 0; kk < size+8; kk++)
-					printf("%c ", pattern[k][kk]);
-				printf("\n");
-				}*/
-			
-
 		}
 	}
 
 
 
-	printf ( "empty: %d\n", number );
+	printf ( "\nempty: %d\n", number );
 
 }
 
@@ -589,7 +587,7 @@ char** create_canvas_pattern ( char *data, int version ) //pattern for image
 
 	size = ( ( ( version - 1 ) * 4 ) + 21 );
 	size+=8; //white border
-	pattern = (char**)calloc( size, sizeof(char*));
+	pattern = ( char** )calloc( size, sizeof(char*) );
 	
 	for ( i = 0; i < size; i++)
 	{
@@ -629,13 +627,14 @@ char** create_canvas_pattern ( char *data, int version ) //pattern for image
 
 	add_data ( pattern, data, version); //add data
 
-	printf("\n");
+	/*printf("\n");
+
 	for ( i = 0; i < size; i++) //output pattern. for test only
 	{
 		for ( j = 0; j < size; j++)
 			printf("%c ", pattern[i][j]);
 		printf("\n");
-	}
+	}*/
 
 	return pattern;
 }

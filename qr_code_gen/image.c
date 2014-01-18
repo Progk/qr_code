@@ -19,10 +19,10 @@ void create_header ( bmp_file_header *bmp, int version )
 	bmp->image_data = 54;
 
 	bmp->header_length = 40;
-	bmp->image_width = ( ( ( ( version - 1 ) * 4 ) + 21 ) + 8) * PIXEL_PER_MODUL; //test
+	bmp->image_width = ( ( ( ( version - 1 ) * 4 ) + 21 ) + 8) * PIXEL_PER_MODUL;
 	bmp->image_height = bmp->image_width;
 	bmp->image_planes = 1;
-	bmp->bit_per_pixel = 24; //24
+	bmp->bit_per_pixel = 24;
 	bmp->image_compression = 0;
 	bmp->image_data_length = bmp->size - 54;
 	bmp->hor_res = 0;
@@ -60,11 +60,11 @@ void create_bmp ( char **pattern, char *name, int version )
 
 	create_header ( &bmp, version ); //create header
 	
-	black = (char*)calloc(3, sizeof(char));
-	white =(char*)calloc(3, sizeof(char));
+	black = ( char* )calloc( 3, sizeof(char) );
+	white =( char* )calloc( 3, sizeof(char) );
 	memset( white, 255, 3 );
-	data = (char*)calloc( bmp.image_data_length, sizeof(char) );
-	buffer = (char*)calloc( size, sizeof(char) );
+	data = ( char* )calloc( bmp.image_data_length, sizeof(char) );
+	buffer = ( char* )calloc( size, sizeof(char) );
 	
 	var2 = bmp.image_data_length;
 	var2-=size;

@@ -356,7 +356,7 @@ void add_sync_line ( char **pattern, int size )
 void add_code_version ( char** pattern, int version ) //add
 {
 	int i;
-	int x = 4; //beginning of dark array
+	int x = 4; //beginn of dark array
 	for ( i = 0; i < 6; i++ )
 	{
 		pattern[x + 4 * version + 6][x+i] = code_version[version][i]; //top

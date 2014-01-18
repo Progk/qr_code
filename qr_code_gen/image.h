@@ -3,7 +3,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#define PIXEL_PER_MODUL 10
+#define PIXEL_PER_MODUL 100
 
 #include <stdio.h>
 #include <string.h>

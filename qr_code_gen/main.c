@@ -11,7 +11,7 @@ int main()
 	printf ( "%s", "QR Code Generator ( ASCII symbols only )" );
 	
 	printf ( "\n\n\n%s\n", "Enter string: " );
-	fgets ( &input[0], 1024, stdin );
+		fgets ( &input[0], 1024, stdin );
 	
 	if ( strlen ( input ) != 1 )
 		input[strlen( input ) - 1] = '\0';
@@ -29,7 +29,7 @@ int main()
 
 	qr_code_generation ( &input[0], &output[0] );
 	
-	printf( "\n%s", "QR Code was built successful!" );
+	printf( "\n%s", "QR Code was generated successful!" );
 
 	getchar();
 	return 0;

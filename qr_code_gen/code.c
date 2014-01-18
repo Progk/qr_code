@@ -190,7 +190,6 @@ int** create_correction_block( char **mas, int version ) //fix
 		{
 			strncpy( &bin[0], mas[i] + (j-1) * 8, 8 );
 			correction_blocks[i][j] = convert_to_int( &bin[0] );
-			//printf("%d ", correction_blocks[i][j] );
 		}
 
 		for ( j = 1; j <= number; j++ )
@@ -248,8 +247,8 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 
 	for ( i = 0; i < extra_size; i++ ) //extra blocks
 	{
-		data[var] = blocks[number][i];
-		memcpy ( &data[var], &blocks[number][i*8], 8 );
+		data[var] = blocks[number - 1][i];
+		memcpy ( &data[var], &blocks[number - 1][i*8], 8 );
 		var+=8;
 	}
 
@@ -264,7 +263,6 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	}
 
 	data[col] = '\0';
-	//printf( "%s", data );
 	return data;
 }
 
@@ -600,11 +598,6 @@ void add_data ( char **pattern, char *data, int version)
 				}
 			}
 		}
-
-
-
-		//printf ( "\nempty: %d\n", number );
-
 	}
 
 	char** create_canvas_pattern ( char *data, int version ) //pattern for image
@@ -660,15 +653,6 @@ void add_data ( char **pattern, char *data, int version)
 		add_mask ( pattern, size ); //add mask
 
 		add_data ( pattern, data, version); //add data
-
-		/*printf("\n");
-
-		for ( i = 0; i < size; i++) //output pattern. for test only
-		{
-		for ( j = 0; j < size; j++)
-		printf("%c ", pattern[i][j]);
-		printf("\n");
-		}*/
 
 		return pattern;
 	}

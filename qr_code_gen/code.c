@@ -190,7 +190,7 @@ int** create_correction_block( char **mas, int version ) //fix
 		{
 			strncpy( &bin[0], mas[i] + (j-1) * 8, 8 );
 			correction_blocks[i][j] = convert_to_int( &bin[0] );
-			printf("%d ", correction_blocks[i][j] );
+			//printf("%d ", correction_blocks[i][j] );
 		}
 
 		for ( j = 1; j <= number; j++ )
@@ -264,7 +264,7 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	}
 
 	data[col] = '\0';
-	printf( "%s", data );
+	//printf( "%s", data );
 	return data;
 }
 
@@ -603,7 +603,7 @@ void add_data ( char **pattern, char *data, int version)
 
 
 
-		printf ( "\nempty: %d\n", number );
+		//printf ( "\nempty: %d\n", number );
 
 	}
 
@@ -672,3 +672,36 @@ void add_data ( char **pattern, char *data, int version)
 
 		return pattern;
 	}
+
+
+void qr_code_generation ( char *input, char *output )
+{
+	int i;
+	int j;
+	int version;
+	int size;
+	char *str_source_bin;
+	char *data;
+	char **blocks;
+	char **pattern;
+	int  **correction_blocks;
+	
+
+	str_source_bin = convert_to_utf8( input ); //convert string to utf8 ascii
+	
+	version = optimal_version( strlen( str_source_bin ) ); //optimal version
+	
+	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
+	
+	blocks = create_blocks( str_source_bin, version ); //create blocks
+	
+	correction_blocks = create_correction_block( blocks, version ); //create correction blocks
+	
+	data = create_data ( blocks, correction_blocks, version ); //create data for qr code
+	
+	pattern = create_canvas_pattern ( data, version ); //create pattern for bmp
+	
+	create_bmp( pattern, output, version ); //create bmp
+
+
+}

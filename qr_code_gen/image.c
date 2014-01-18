@@ -33,12 +33,14 @@ void create_header ( bmp_file_header *bmp, int version )
 
 void create_bmp ( char **pattern, char *name, int version )
 {
-	FILE *f;
+	FILE *file;
 	bmp_file_header bmp;
 	char *data;
 	char *buffer;
 	char *black;
 	char *white;
+	char *output;
+	char end[5] = "";
 	int number; //number elements in column
 	int size; //size string in bmp image
 	int i;
@@ -98,8 +100,18 @@ void create_bmp ( char **pattern, char *name, int version )
 		}
 	}
 
-	f = fopen( "test.bmp", "wb" );
-	fwrite( &bmp, sizeof(bmp), 1, f );
-	fwrite( data, bmp.image_data_length, 1, f );
-	fclose(f);
+	output = name;
+	if ( strlen( name ) >= 4 )
+		memcpy ( end, &name[strlen( name ) - 4], 4 );
+	if ( strcmp( end, ".bmp" ) != 0 )
+	{
+		output = ( char* )calloc( strlen( name ) + 4, sizeof ( char ) );
+		strcat( output, name );
+		strcat( output, ".bmp" );
+	}
+		
+	file = fopen( output, "wb" );
+	fwrite( &bmp, sizeof(bmp), 1, file );
+	fwrite( data, bmp.image_data_length, 1, file );
+	fclose(file);
 }

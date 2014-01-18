@@ -39,4 +39,6 @@ void add_data ( char **pattern, char *data, int version);
 
 char** create_canvas_pattern ( char *data, int version ); //pattern for image
 
+void qr_code_generation ( char *input, char *output ); //qr code generator
+
 #endif

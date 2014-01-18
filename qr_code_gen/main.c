@@ -1,55 +1,37 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <string.h>
-#include <malloc.h>
-#include <math.h>
-#include "qr_table.h"
-#include "image.h"
 #include "code.h"
 
 
 int main()
 {
-	int i;
-	int j;
-	int version;
-	char *str_source = "QR codes must include function patterns. These are shapes that must be placed in specific areas of the QR code"; //for now only 14 symbols works properly
-	//char *str_source = "hello";
-	char *str_source_bin;
-	char **blocks;
-	int **correction_blocks;
-	char **pattern;
-	char *data;
-
-
-	//testing information
-	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
-	printf("source: \n%s\n\n", str_source_bin );
-	version = optimal_version( strlen( str_source_bin ) ); //optimal version
-	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
-	blocks = create_blocks( str_source_bin, version ); //create blocks
-	correction_blocks = create_correction_block( blocks, version ); //create correction blocks
-	printf("\nversion: %d", version);
-	printf("\nsize: %d", strlen(str_source_bin));
-	printf("\nnumber of blocks: %d", number_of_blocks[version]);
-	printf("\n\nbin full: \n%s\n", str_source_bin);
-	printf("\nblocks:");
-	//pattern = create_canvas_pattern ( blocks, correction_blocks, version );
-	for ( i = 0; i < number_of_blocks[version]; i++) //output blocks
-			printf ("\nn:%d size:%d\n%s ", i, strlen(blocks[i]), blocks[i]);
-	printf("\n\ncorrection blocks:");
-	for ( i = 0; i < number_of_blocks[version]; i++) //output corrections blocks
-	{
-		printf ("\ncor_n:%d size:%d\n", i, correction_blocks[i][0] );
-			for ( j = 1; j <= correction_blocks[i][0]; j++)
-				printf( "%d ", correction_blocks[i][j] );
-	}
-	printf("\n\n");
-	data = create_data ( blocks, correction_blocks, version );
-	pattern = create_canvas_pattern ( data, version );
-	create_bmp( pattern, "my", version );
+	char input[2048];
+	char output[2048];
 	
+	printf ( "%s", "QR Code Generator ( ASCII symbols only )" );
 	
+	printf ( "\n\n\n%s\n", "Enter string: " );
+	fgets ( &input[0], 1024, stdin );
+	
+	if ( strlen ( input ) != 1 )
+		input[strlen( input ) - 1] = '\0';
+	else
+		return 0;
+
+	printf ( "\n%s\n", "Enter name of BMP file: " );
+
+	fgets ( &output[0], 1024, stdin );
+
+	if ( strlen ( output ) != 1 )
+		output[strlen( output ) - 1] = '\0';
+	else
+		return 0;
+
+	qr_code_generation ( &input[0], &output[0] );
+	
+	printf( "\n%s", "QR Code was built successful!" );
+
 	getchar();
+	return 0;
 
 }

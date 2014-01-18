@@ -1,14 +1,15 @@
-﻿Build started 18.01.2014 13:22:51.
+﻿Build started 18.01.2014 21:39:10.
      1>Project "D:\Sergey\C\qr_code\qr_code_gen\qr_code_gen.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\qr_code_gen.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt code.c
          code.c
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(44): warning C4018: '<' : signed/unsigned mismatch
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(88): warning C4018: '>' : signed/unsigned mismatch
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(475): warning C4101: 'kk' : unreferenced local variable
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(474): warning C4101: 'k' : unreferenced local variable
+     1>d:\sergey\c\qr_code\qr_code_gen\code.c(4): warning C4029: declared formal parameter list different from definition
+     1>d:\sergey\c\qr_code\qr_code_gen\code.c(37): warning C4018: '<' : signed/unsigned mismatch
+     1>d:\sergey\c\qr_code\qr_code_gen\code.c(81): warning C4018: '>' : signed/unsigned mismatch
+     1>d:\sergey\c\qr_code\qr_code_gen\code.c(472): warning C4101: 'kk' : unreferenced local variable
+     1>d:\sergey\c\qr_code\qr_code_gen\code.c(471): warning C4101: 'k' : unreferenced local variable
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Sergey\C\qr_code\Debug\qr_code_gen.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\qr_code_gen.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Sergey\C\qr_code\Debug\qr_code_gen.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Sergey\C\qr_code\Debug\qr_code_gen.lib" /MACHINE:X86 Debug\code.obj
          Debug\image.obj
@@ -25,4 +26,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.53
+Time Elapsed 00:00:00.46

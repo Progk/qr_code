@@ -13,7 +13,8 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "hello, this is first qr code version > 2"; //for now only 14 symbols works properly
+	//char *str_source = "QR codes must include function patterns. These are shapes that must be placed in specific areas of the QR code"; //for now only 14 symbols works properly
+	char *str_source = "hello";
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;

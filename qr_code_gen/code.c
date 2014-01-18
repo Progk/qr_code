@@ -1,27 +1,20 @@
 #include "code.h"
 
-char* convert_to_bin( unsigned int num ) //convert int to binary
+char* convert_to_bin( unsigned int num, unsigned int bit ) //convert int to binary, bit is number of digit
 {
-	int i;
 	char *str_bin;
-	//if (num < 128)
-	//{
-		i=7;
-		str_bin = ( char* )calloc( 8, sizeof( char )); //bin str
-		memset( str_bin, (char)((int)'0'), 8 ); //initializing array
-	//}
-	//else
-	//{
-	//	i=15;
-	//	str_bin = ( char* )calloc( 16, sizeof( char )); //bin str
-	//	memset( str_bin, (char)((int)'0'), 16 ); //initializing array
-	//}
+
+	str_bin = ( char* )calloc( bit, sizeof( char )); //bin str
+	memset( str_bin, (char)((int)'0'), bit ); //initializing array
+	
+	bit--;
 	while ( num > 0 )
 	{
-		str_bin[i] += num%2;
-		i--;
+		str_bin[bit] += num%2;
+		bit--;
 		num/=2;
 	}
+
 	return str_bin;
 }
 
@@ -42,7 +35,7 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 	char *str_bin;
 	str_bin = ( char* )calloc( strlen( str ) * 8 + 1, sizeof( char )); //for bin str
 	for ( i = 0; i < strlen( str ); i++ )
-		memcpy( str_bin + i*8, convert_to_bin( str[i] ), 8 * sizeof( char )); //copy binary code
+		memcpy( str_bin + i*8, convert_to_bin( str[i], 8 ), 8 * sizeof( char )); //copy binary code
 	str_bin[ strlen( str ) * 8 + 1 ] = '\0'; //add end of str
 	return str_bin;
 }
@@ -108,7 +101,7 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	str_full = ( char* )calloc( strlen( str ) + data + zero + extra*8, sizeof(char) ); //new str full
 	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
-	strcpy(&str_full[4], convert_to_bin(strlen( str )/8)); //add size of data
+	strcpy(&str_full[4], convert_to_bin(strlen( str ) / 8, data - 4 )); //add size of data
 	//strcpy(&str_full[4], convert_to_bin(sizeof(*str))); //add size of data
 	strcpy(&str_full[data], str); //add data(bit)
 	strcpy(&str_full[data + strlen(str)], zero_str); //add zero
@@ -257,9 +250,10 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	{
 		for ( j = 0 ; j < number; j++)
 		{
-			buf = convert_to_bin (cor_blocks[j][i+1]);
-			buf[8]='\0';
-			strcpy( &data[var], buf );
+			buf = convert_to_bin ( cor_blocks[j][i+1], 8 );
+			//buf[8]='\0';
+			//strcpy( &data[var], buf );
+			memcpy( &data[var], buf, 8 );
 			var+=8;
 		}
 	}
@@ -327,28 +321,31 @@ void add_finder_patterns ( char **pattern, int x, int y )
 
 }
 
-int test_alignment ( char **pattern, int element )
+int test_alignment ( char **pattern, int x, int y )
 {
 	int i;
 	int j;
-	int x = 4; //begin of dark array
+	int sign = 1;
+	int offset = 4; //begin of dark array
 
-	for ( i = 0; i < 5; i++ )
+	for ( i = x + offset; i <= x + offset + 5; i++ )
 	{
-		for ( j = 0; j < 5; j++ )
-			if ( pattern[element - 2 + i + x][element - 2 + x + j] != '+' )
+		for ( j = y + offset; j <= y + offset + 5; j++ )
+		{
+			if ( pattern[i][j] != '+' )
 				return 1;
+		}
 	}
 
 	return 0;
 }
 
-void add_alignment ( char **pattern, int element )
+void add_alignment ( char **pattern, int x, int y )
 {
 	int i;
 	int j;
 	int sign = 1;
-	int x = 4; //begin of dark array
+	int offset = 4; //begin of dark array
 
 	for ( i = 0; i < 5; i++ )
 	{
@@ -359,21 +356,21 @@ void add_alignment ( char **pattern, int element )
 
 			if ( ( i == 0 ) || ( i == 4 ) )
 			{
-				pattern[element - 2 * sign + x][element - 2 + j + x] = '1';
+				pattern[x - 2 * sign + offset][y - 2 + j + offset] = '1';
 			}
 			else if ( ( i == 1 ) || ( i == 3 ) )
 			{
 				if ( ( j == 0 ) || ( j == 4 ) )
-					pattern[element - 1 * sign + x][element - 2 + j + x] = '1';
+					pattern[x - 1 * sign + offset][y - 2 + j + offset] = '1';
 				else
-					pattern[element - 1 * sign + x][element - 2 + j + x] = '0';
+					pattern[x- 1 * sign + offset][y - 2 + j + offset] = '0';
 			}
 			else
 			{
 				if ( j%2 == 0 )
-					pattern[element + x][element - 2 + j + x] = '1';
+					pattern[x + offset][y - 2 + j + offset] = '1';
 				else
-					pattern[element + x][element - 2 + j + x] = '0';
+					pattern[x + offset][y - 2 + j + offset] = '0';
 			}
 		}
 	}
@@ -389,8 +386,8 @@ void add_alignment_patterns ( char **pattern, int version ) //add
 	{
 		for ( j = 0; j < alignment_patterns[version][0]; j++ )
 		{
-			if ( test_alignment ( pattern, alignment_patterns[version][j + 1] ) == 0 )
-				add_alignment( pattern, alignment_patterns[version][j + 1] );
+			if ( test_alignment ( pattern, alignment_patterns[version][i + 1], alignment_patterns[version][j + 1] ) == 0 )
+				add_alignment( pattern, alignment_patterns[version][i + 1], alignment_patterns[version][j + 1] );
 		}
 	}
 

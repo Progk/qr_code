@@ -15,6 +15,6 @@ int inverse_field_values[256];
 
 int alignment_patterns[41][8];
 
-char code_version[40][18];
+char *code_version[41];
 
 #endif

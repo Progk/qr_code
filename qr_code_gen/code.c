@@ -6,7 +6,7 @@ char* convert_to_bin( unsigned int num, unsigned int bit ) //convert int to bina
 
 	str_bin = ( char* )calloc( bit, sizeof( char ) ); //bin str
 	memset( str_bin, ( char )( ( int )'0' ), bit ); //initializing array
-	
+
 	bit--;
 	while ( num > 0 )
 	{
@@ -40,7 +40,7 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 
 	for ( i = 0; i < strlen( str ); i++ )
 		memcpy( str_bin + i*8, convert_to_bin( str[i], 8 ), 8 * sizeof( char ) ); //copy binary code
-	
+
 	str_bin[strlen( str ) * 8 + 1] = '\0'; //end of string
 
 	return str_bin;
@@ -67,7 +67,7 @@ int optimal_version ( int size ) //chosing optimal version
 			break;
 		}
 
-	return version;
+		return version;
 }
 
 
@@ -133,11 +133,11 @@ char** create_blocks( char *str, int version )
 	int extra_size; //extra bit
 	int number = number_of_blocks[version]; //number of blocks
 	int element = 0; //pointer to starting copy of string
-	
+
 	size = ( size_of_information[version] / 8 ) / number; //number byte in block
 	extra_size = ( size_of_information[version] / 8 ) % number; //extra byte
 	mas = ( char** )calloc( number, sizeof(char*) );
-	
+
 	for ( i = 0; i < number; i++ )
 	{
 		if ( ( i + extra_size ) != number )
@@ -156,7 +156,7 @@ char** create_blocks( char *str, int version )
 			extra_size--;
 		}
 	}
-	
+
 	return mas;
 }
 
@@ -173,7 +173,7 @@ int** create_correction_block( char **mas, int version ) //fix
 	int** correction_blocks; //corrections blocks
 	int correction; //number of correction byte
 	char bin[8]; //array of byte
-	
+
 	correction_blocks = ( int** )calloc( number_of_blocks[version], sizeof(int*) );
 	correction = number_of_correction_byte[version];
 
@@ -192,7 +192,7 @@ int** create_correction_block( char **mas, int version ) //fix
 			correction_blocks[i][j] = convert_to_int( &bin[0] );
 			printf("%d ", correction_blocks[i][j] );
 		}
-		
+
 		for ( j = 1; j <= number; j++ )
 		{
 			element = correction_blocks[i][1];
@@ -210,9 +210,9 @@ int** create_correction_block( char **mas, int version ) //fix
 
 				}
 			}
-			
+
 		}
-		
+
 	}
 	return correction_blocks;
 }
@@ -236,7 +236,7 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	buf = (char*)calloc(8, sizeof(char));
 	size = (size_of_information[version] / 8) / number; //number byte in block
 	extra_size = (size_of_information[version] / 8) % number; //extra byte
-	
+
 	for ( i = 0; i < size; i++) //blocks
 	{
 		for ( j = 0 ; j < number; j++)
@@ -318,7 +318,7 @@ void add_finder_patterns ( char **pattern, int x, int y )
 				}
 				pattern[x + i][y + offset_y] = '0';
 				pattern[x + offset_x][y + i] = '0';
-				
+
 			}
 		}
 	}
@@ -443,7 +443,7 @@ void add_mask ( char **pattern, int size )
 	int var = 0;
 	int var2 = 0;
 	char mask[] = "101010000010010";
-	
+
 	for ( i = 4; i < 12; i++ )
 	{
 		if (i != 10 ) //reserved module
@@ -480,23 +480,32 @@ void add_data ( char **pattern, char *data, int version)
 	int x = size + 3; //next X coord
 	int off_y_up = size + 3; //offset y up
 	int off_y_down = 4; //offset Y down
-	
+
+
 	for ( i = 4; i <= ( size + 4 ); i++ ) //counting empty elements
 		for ( j = 4; j <= ( size + 4 ); j++ )
 			if ( pattern[i][j] == '+' )
 				number++;
 
-	for ( i = 0; i < (size-1)/2; i++ )
+	for ( i = 0; i < (size - 1) / 2; i++ )
 	{
-		if ( ( x - i*2 ) == 10 )
+		if ( ( x - i * 2 ) == 10 )
 			x--;
+
 		for ( j = 0; j < size; j++ )
 		{
-			if ( i%2 == 0 )
+			if ( i % 2 == 0 )
 			{
 				if ( pattern[off_y_up - j][x - i * 2] == '+' )
 				{
-					if ( ( off_y_up - j + x - i * 2 ) % 2 == 0 )
+					if ( number <= 0 )
+					{
+						if ( ( off_y_up - j + x - i * 2 ) % 2 == 0 )
+							pattern[off_y_up - j][x - i * 2] = '1';
+						else
+							pattern[off_y_up - j][x - i * 2] = '0';
+					}
+					else if ( ( off_y_up - j + x - i * 2 ) % 2 == 0 )
 					{
 						if ( data[var] == '1' )
 							pattern[off_y_up - j][x - i * 2] = '0';
@@ -505,136 +514,161 @@ void add_data ( char **pattern, char *data, int version)
 					}
 					else
 					{
-					pattern[off_y_up - j][x - i * 2] = data[var];
+						pattern[off_y_up - j][x - i * 2] = data[var];
 					}
 					var++;
 					number--;
-				 }
+				}
 
 				if ( pattern[off_y_up - j][x - i * 2 - 1] == '+' )
 				{
-					if ( ( off_y_up - j + x - i * 2 - 1 ) % 2 == 0 )
+					if ( number <= 0 )
+					{
+						if ( ( off_y_up - j + x - i * 2 - 1 ) % 2 == 0 )
+							pattern[off_y_up - j][x - i * 2 - 1] = '1';
+						else
+							pattern[off_y_up - j][x - i * 2 - 1] = '0';
+					}
+					else if ( ( off_y_up - j + x - i * 2 - 1 ) % 2 == 0 )
 					{
 						if ( data[var] == '1' )
-							pattern[off_y_up - j][x - i*2 - 1] = '0';
+							pattern[off_y_up - j][x - i * 2 - 1] = '0';
 						else
-							pattern[off_y_up - j][x - i*2 - 1] = '1';
+							pattern[off_y_up - j][x - i * 2 - 1] = '1';
 					}
 					else
 					{
-					pattern[off_y_up - j][x - i*2 - 1] = data[var];
+						pattern[off_y_up - j][x - i * 2 - 1] = data[var];
 					}
 					var++;
 					number--;
-				 }		
+				}		
 			}
 			else
 			{
-				if ( pattern[off_y_down + j][x - i * 2] == '+' )
-				{
-					if ( (off_y_down + j + x - i * 2)%2 == 0 )
-					{
-						if ( data[var] == '1' )
-							pattern[off_y_down + j][x - i * 2] = '0';
-						else
-							pattern[off_y_down + j][x - i * 2] = '1';
-					}
-					else
-					{
-					pattern[off_y_down + j][x - i * 2] = data[var];
-					}
-					var++;
-					number--;
-				 }
-
 				if ( pattern[off_y_down + j][x - i * 2 - 1] == '+' )
 				{
-					if ( (off_y_down + j + x - i * 2 - 1) % 2 == 0 )
+					if ( number <= 0 )
 					{
-						if ( data[var] == '1' )
-							pattern[off_y_down + j][x - i * 2 - 1] = '0';
+						if ( (off_y_down + j + x - i * 2) % 2 == 0 )
+							pattern[off_y_down + j][x - i * 2] = '1';
 						else
-							pattern[off_y_down + j][x - i * 2 - 1] = '1';
+							pattern[off_y_down + j][x - i * 2] = '0';
 					}
-					else
+					else if ( pattern[off_y_down + j][x - i * 2] == '+' )
 					{
-					pattern[off_y_down + j][x - i * 2 - 1] = data[var];
+
+						if ( (off_y_down + j + x - i * 2) % 2 == 0 )
+						{
+							if ( data[var] == '1' )
+								pattern[off_y_down + j][x - i * 2] = '0';
+							else
+								pattern[off_y_down + j][x - i * 2] = '1';
+						}
+						else
+						{
+							pattern[off_y_down + j][x - i * 2] = data[var];
+						}
+						var++;
+						number--;
 					}
-					var++;
-					number--;
-				 }
+				}
+
+					if ( pattern[off_y_down + j][x - i * 2 - 1] == '+' )
+					{
+						if ( number <= 0 )
+						{
+							if ( (off_y_down + j + x - i * 2 - 1) % 2 == 0 )
+								pattern[off_y_down + j][x - i * 2 - 1] = '1';
+							else
+								pattern[off_y_down + j][x - i * 2 - 1] = '0';
+						}
+						else if ( (off_y_down + j + x - i * 2 - 1) % 2 == 0 )
+						{
+							if ( data[var] == '1' )
+								pattern[off_y_down + j][x - i * 2 - 1] = '0';
+							else
+								pattern[off_y_down + j][x - i * 2 - 1] = '1';
+						}
+						else
+						{
+							pattern[off_y_down + j][x - i * 2 - 1] = data[var];
+						}
+						var++;
+						number--;
+					}
+				}
 			}
 		}
-	}
 
 
 
-	printf ( "\nempty: %d\n", number );
-
-}
-
-char** create_canvas_pattern ( char *data, int version ) //pattern for image
-{
-	// + is empty
-	// 0 is white
-	// 1 is black
-	
-	int i;
-	int j;
-	int x = 4; //begin of dark array
-	int size; //size of canvas(module)
-	char **pattern; //canvas
-
-	size = ( ( ( version - 1 ) * 4 ) + 21 );
-	size+=8; //white border
-	pattern = ( char** )calloc( size, sizeof(char*) );
-	
-	for ( i = 0; i < size; i++)
-	{
-		pattern[i] = (char*)calloc(size, sizeof(char));
-		memset( pattern[i], (char)((int)'+'), size ); //initializing array
+		printf ( "\nempty: %d\n", number );
 
 	}
 
-	for ( i = 0; i < size; i++) //white border
+	char** create_canvas_pattern ( char *data, int version ) //pattern for image
 	{
-		for ( j = 0; j < size; j++)
+		// + is empty
+		// 0 is white
+		// 1 is black
+
+		int i;
+		int j;
+		int x = 4; //begin of dark array
+		int size; //size of canvas(module)
+		char **pattern; //canvas
+
+		size = ( ( ( version - 1 ) * 4 ) + 21 );
+		size+=8; //white border
+		pattern = ( char** )calloc( size, sizeof(char*) );
+
+		for ( i = 0; i < size; i++)
 		{
-			if ( i < 4 )
-				pattern[i][j] = '0';
-			else if ( (j < 4) | (j > size - 5) | (i > size - 5)  )
-				pattern[i][j] = '0';
+			pattern[i] = (char*)calloc(size, sizeof(char));
+			memset( pattern[i], (char)((int)'+'), size ); //initializing array
+
 		}
-	}
 
-	pattern[x + 4 * version + 9][x + 8] = '1'; //black module
+		for ( i = 0; i < size; i++) //white border
+		{
+			for ( j = 0; j < size; j++)
+			{
+				if ( i < 4 )
+					pattern[i][j] = '0';
+				else if ( (j < 4) | (j > size - 5) | (i > size - 5)  )
+					pattern[i][j] = '0';
+			}
+		}
 
-	add_finder_patterns ( pattern, x, x); //finder pattern - left top
-	
-	add_finder_patterns ( pattern, x, size - x - 7); //finder pattern - rigth top
-	
-	add_finder_patterns ( pattern, size - x - 7, x); //finder pattern - left bottom
-	
-	if ( version >= 2 )
-		add_alignment_patterns ( pattern, version ); //add aligment
-	
-	add_sync_line ( pattern, size ); //add sync line
+		pattern[x + 4 * version + 9][x + 8] = '1'; //black module
 
-	if ( version >= 7 )
-		add_code_version ( pattern, version ); //add code version
-	
-	add_mask ( pattern, size ); //add mask
+		add_finder_patterns ( pattern, x, x); //finder pattern - left top
 
-	add_data ( pattern, data, version); //add data
+		add_finder_patterns ( pattern, x, size - x - 7); //finder pattern - rigth top
 
-	/*printf("\n");
+		add_finder_patterns ( pattern, size - x - 7, x); //finder pattern - left bottom
 
-	for ( i = 0; i < size; i++) //output pattern. for test only
-	{
+		if ( version >= 2 )
+			add_alignment_patterns ( pattern, version ); //add aligment
+
+		add_sync_line ( pattern, size ); //add sync line
+
+		if ( version >= 7 )
+			add_code_version ( pattern, version ); //add code version
+
+		add_mask ( pattern, size ); //add mask
+
+		add_data ( pattern, data, version); //add data
+
+		/*printf("\n");
+
+		for ( i = 0; i < size; i++) //output pattern. for test only
+		{
 		for ( j = 0; j < size; j++)
-			printf("%c ", pattern[i][j]);
+		printf("%c ", pattern[i][j]);
 		printf("\n");
-	}*/
+		}*/
 
-	return pattern;
-}
+		return pattern;
+	}

@@ -13,13 +13,16 @@ int main()
 	int i;
 	int j;
 	int version;
-	//char *str_source = "QR codes must include function patterns. These are shapes that must be placed in specific areas of the QR code"; //for now only 14 symbols works properly
-	char *str_source = "hello";
+	char *str_source = "QR codes must include function patterns. These are shapes that must be placed in specific areas of the QR code"; //for now only 14 symbols works properly
+	//char *str_source = "hello";
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
 	char **pattern;
 	char *data;
+
+
+	//testing information
 	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
 	printf("source: \n%s\n\n", str_source_bin );
 	version = optimal_version( strlen( str_source_bin ) ); //optimal version
@@ -47,8 +50,6 @@ int main()
 	create_bmp( pattern, "my", version );
 	
 	
-
-
 	getchar();
 
 }

@@ -27,7 +27,7 @@ char* create_data ( char **blocks, int **cor_blocks, int version );
 
 void add_finder_patterns ( char **pattern, int x, int y );
 
-void add_aligment_patterns ( char **pattern, int version ); //add
+void add_alignment_patterns ( char **pattern, int version ); //add
 
 void add_sync_line ( char **pattern, int size );
 

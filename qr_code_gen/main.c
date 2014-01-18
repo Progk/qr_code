@@ -13,7 +13,7 @@ int main()
 	int i;
 	int j;
 	int version;
-	char *str_source = "HELLO"; //for now only 14 symbols works properly
+	char *str_source = "hello, this is first qr code version > 2"; //for now only 14 symbols works properly
 	char *str_source_bin;
 	char **blocks;
 	int **correction_blocks;
@@ -22,7 +22,6 @@ int main()
 	str_source_bin = convert_to_utf8( str_source ); //convert string to utf8 ascii
 	printf("source: \n%s\n\n", str_source_bin );
 	version = optimal_version( strlen( str_source_bin ) ); //optimal version
-	version = 7;
 	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
 	blocks = create_blocks( str_source_bin, version ); //create blocks
 	correction_blocks = create_correction_block( blocks, version ); //create correction blocks

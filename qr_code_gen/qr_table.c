@@ -95,7 +95,7 @@ int inverse_field_values[256] = {0, 0, 1, 25, 2, 50, 26, 198, 3, 223, 51, 238, 2
 								79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168, 80, 88, 175};
 
 //first element is size of array
-int aligment_patterns[41][8] = {
+int alignment_patterns[41][8] = {
 							  {0}, //0
 							  {0}, //1
 							  {1, 18}, //2

@@ -13,7 +13,7 @@ int field_values[256];
 
 int inverse_field_values[256];
 
-int aligment_patterns[41][8];
+int alignment_patterns[41][8];
 
 char code_version[40][18];
 

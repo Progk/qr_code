@@ -327,9 +327,72 @@ void add_finder_patterns ( char **pattern, int x, int y )
 
 }
 
-void add_aligment_patterns ( char **pattern, int version ) //add
+int test_alignment ( char **pattern, int element )
 {
+	int i;
+	int j;
+	int x = 4; //begin of dark array
 
+	for ( i = 0; i < 5; i++ )
+	{
+		for ( j = 0; j < 5; j++ )
+			if ( pattern[element - 2 + i + x][element - 2 + x + j] != '+' )
+				return 1;
+	}
+
+	return 0;
+}
+
+void add_alignment ( char **pattern, int element )
+{
+	int i;
+	int j;
+	int sign = 1;
+	int x = 4; //begin of dark array
+
+	for ( i = 0; i < 5; i++ )
+	{
+		for ( j = 0; j < 5; j++ )
+		{
+			if ( i >= 3 )
+				sign = -1;
+
+			if ( ( i == 0 ) || ( i == 4 ) )
+			{
+				pattern[element - 2 * sign + x][element - 2 + j + x] = '1';
+			}
+			else if ( ( i == 1 ) || ( i == 3 ) )
+			{
+				if ( ( j == 0 ) || ( j == 4 ) )
+					pattern[element - 1 * sign + x][element - 2 + j + x] = '1';
+				else
+					pattern[element - 1 * sign + x][element - 2 + j + x] = '0';
+			}
+			else
+			{
+				if ( j%2 == 0 )
+					pattern[element + x][element - 2 + j + x] = '1';
+				else
+					pattern[element + x][element - 2 + j + x] = '0';
+			}
+		}
+	}
+}
+
+void add_alignment_patterns ( char **pattern, int version ) //add
+{
+	int i;
+	int j;
+	int x = 4; //begin of dark array
+
+	for ( i = 0; i < alignment_patterns[version][0]; i++ )
+	{
+		for ( j = 0; j < alignment_patterns[version][0]; j++ )
+		{
+			if ( test_alignment ( pattern, alignment_patterns[version][j + 1] ) == 0 )
+				add_alignment( pattern, alignment_patterns[version][j + 1] );
+		}
+	}
 
 }
 
@@ -557,17 +620,17 @@ char** create_canvas_pattern ( char *data, int version ) //pattern for image
 	
 	add_finder_patterns ( pattern, size - x - 7, x); //finder pattern - left bottom
 	
-	add_aligment_patterns ( pattern, version ); //add aligment
+	if ( version >= 2 )
+		add_alignment_patterns ( pattern, version ); //add aligment
 	
 	add_sync_line ( pattern, size ); //add sync line
 
-	version = 7;
 	if ( version >= 7 )
 		add_code_version ( pattern, version ); //add code version
 	
-	//add_mask ( pattern, size ); //add mask
+	add_mask ( pattern, size ); //add mask
 
-	//add_data ( pattern, data, version); //add data
+	add_data ( pattern, data, version); //add data
 
 	printf("\n");
 	for ( i = 0; i < size; i++) //output pattern. for test only

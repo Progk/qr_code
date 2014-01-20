@@ -4,8 +4,9 @@ char* convert_to_bin( unsigned int num, unsigned int bit ) //convert int to bina
 {
 	char *str_bin;
 
-	str_bin = ( char* )calloc( bit, sizeof( char ) ); //bin str
+	str_bin = ( char* )calloc( bit + 1, sizeof( char ) ); //bin str 0-7 -  bit
 	memset( str_bin, ( char )( ( int )'0' ), bit ); //initializing array
+	str_bin[bit] = '\0';
 
 	bit--;
 	while ( num > 0 )
@@ -39,9 +40,9 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 	str_bin = ( char* )calloc( strlen( str ) * 8 + 1, sizeof( char ) ); //for bin str
 
 	for ( i = 0; i < strlen( str ); i++ )
-		memcpy( str_bin + i*8, convert_to_bin( str[i], 8 ), 8 * sizeof( char ) ); //copy binary code
+		memcpy( str_bin + i * 8, convert_to_bin( str[i], 8 ), 8 * sizeof( char ) ); //copy binary code
 
-	str_bin[strlen( str ) * 8 + 1] = '\0'; //end of string
+	str_bin[strlen( str ) * 8] = '\0'; //end of string
 
 	return str_bin;
 }
@@ -97,7 +98,7 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	}
 
 	zero = (strlen( str ) + data )%8; //number of zero until str%8 != 0
-	zero_str = ( char* )calloc( zero, sizeof( char ) );
+	zero_str = ( char* )calloc( zero + 1, sizeof( char ) );
 	zero_str[zero] = '\0';
 	memset( zero_str, ( char )((int)'0'), zero ); //initializing array
 
@@ -105,13 +106,12 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	if ( buffer < 0 )
 		extra = -buffer/8; //number of extra byte
 
-	str_full = ( char* )calloc( strlen( str ) + data + zero + extra*8, sizeof(char) ); //new str full
+	str_full = ( char* )calloc( strlen( str ) + data + zero + extra*8 + 1, sizeof(char) ); //new str full
 	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
 	strcpy(&str_full[4], convert_to_bin(strlen( str ) / 8, data - 4 )); //add size of data
 	strcpy(&str_full[data], str); //add data(bit)
 	strcpy(&str_full[data + strlen(str)], zero_str); //add zero
-	strlen(str_full);
 
 	for (i = 0; i < extra; i++) //add extra byte
 	{
@@ -142,14 +142,14 @@ char** create_blocks( char *str, int version )
 	{
 		if ( ( i + extra_size ) != number )
 		{
-			mas[i] = ( char* )calloc( size * 8 , sizeof(char) ); //without extra size
+			mas[i] = ( char* )calloc( size * 8 + 1, sizeof(char) ); //without extra size
 			memcpy( mas[i], &str[element], size * 8); 
 			mas[i][size * 8] = '\0';
 			element+=( size * 8 );
 		}
 		else
 		{
-			mas[i] = ( char* )calloc( (size + 1) * 8 , sizeof(char) ); //with extra size
+			mas[i] = ( char* )calloc( (size + 1) * 8 + 1, sizeof(char) ); //with extra size
 			memcpy( mas[i], &str[element], (size + 1) * 8); 
 			mas[i][(size + 1) * 8] = '\0';
 			element+=(size + 1) * 8;
@@ -231,8 +231,10 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 
 	col+=size_of_information[version];
 	col+=number_of_correction_byte[version]*8;
-	data = (char*)calloc(col, sizeof(char));
-	buf = (char*)calloc(8, sizeof(char));
+	data = ( char* )calloc(col + 1, sizeof(char));
+	buf = ( char* )calloc(8 + 1, sizeof(char));
+	data[col] = '\0';
+	data[8] = '\0';
 	size = (size_of_information[version] / 8) / number; //number byte in block
 	extra_size = (size_of_information[version] / 8) % number; //extra byte
 
@@ -262,7 +264,6 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 		}
 	}
 
-	data[col] = '\0';
 	return data;
 }
 
@@ -620,7 +621,6 @@ void add_data ( char **pattern, char *data, int version)
 		{
 			pattern[i] = (char*)calloc(size, sizeof(char));
 			memset( pattern[i], (char)((int)'+'), size ); //initializing array
-
 		}
 
 		for ( i = 0; i < size; i++) //white border
@@ -661,7 +661,6 @@ void add_data ( char **pattern, char *data, int version)
 void qr_code_generation ( char *input, char *output )
 {
 	int i;
-	int j;
 	int version;
 	int size;
 	char *str_source_bin;
@@ -669,14 +668,13 @@ void qr_code_generation ( char *input, char *output )
 	char **blocks;
 	char **pattern;
 	int  **correction_blocks;
-	
 
 	str_source_bin = convert_to_utf8( input ); //convert string to utf8 ascii
-	
+
 	version = optimal_version( strlen( str_source_bin ) ); //optimal version
-	
+
 	str_source_bin = add_service_inf(str_source_bin, &version); //add service information into string
-	
+
 	blocks = create_blocks( str_source_bin, version ); //create blocks
 	
 	correction_blocks = create_correction_block( blocks, version ); //create correction blocks
@@ -687,5 +685,27 @@ void qr_code_generation ( char *input, char *output )
 	
 	create_bmp( pattern, output, version ); //create bmp
 
+	//free str_source_bin
+	free ( str_source_bin );
+
+	//free blocks
+	//free correction_blocks
+	for ( i = 0; i < number_of_blocks[version]; i++ )
+	{
+			free( blocks[i] );
+			free( correction_blocks[i] );
+	}
+	free( blocks );
+	free( correction_blocks ); 
+
+	//free data
+	free( data );
+
+	//free pattern
+	size = ( ( ( version - 1 ) * 4 ) + 21 );
+	size+=8; //white border
+	for ( i = 0; i < size; i++ )
+		free( pattern[i] );
+	free( pattern );
 
 }

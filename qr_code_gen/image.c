@@ -114,4 +114,9 @@ void create_bmp ( char **pattern, char *name, int version )
 	fwrite( &bmp, sizeof(bmp), 1, file );
 	fwrite( data, bmp.image_data_length, 1, file );
 	fclose(file);
+
+	free ( black );
+	free ( white );
+	free ( buffer );
+	free ( data );
 }

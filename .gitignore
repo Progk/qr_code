@@ -1,6 +1,7 @@
 # Object files
 *.o
 *.ko
+*.obj
 
 # Libraries
 *.lib
@@ -13,7 +14,6 @@
 *.dylib
 
 # Executables
-*.exe
 *.out
 *.app
 
@@ -26,6 +26,13 @@ ipch/
 *.cachefile
 Thumbs.db
 *.cache
+*.ilk
+*.pdb
+*.tmp
+*.ipch
+*.idb
+*.tlog
+*.log
 
 # Build results
 [Dd]ebug/

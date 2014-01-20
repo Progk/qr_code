@@ -1,12 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define NUMBER_OF_SYMBOLS 2048
 #include <stdio.h>
 #include "code.h"
 
 
+
 int main()
 {
-	char input[2048];
-	char output[2048];
+	char input[NUMBER_OF_SYMBOLS];
+	char output[NUMBER_OF_SYMBOLS];
 	
 	printf ( "%s", "QR Code Generator ( ASCII symbols only )" );
 	
@@ -32,6 +34,10 @@ int main()
 	printf( "\n%s", "QR Code was generated successful!" );
 
 	getchar();
+
+	//free ( &input[0] );
+	//free ( &output[0] );
+
 	return 0;
 
 }

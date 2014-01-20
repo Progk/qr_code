@@ -14,8 +14,9 @@
 typedef unsigned short WORD; 
 typedef unsigned long DWORD; 
 
+//header of bmp file
 #pragma pack(push, 2)
-typedef struct
+typedef struct 
 {
 	WORD signature; //BM
 	DWORD size; 
@@ -38,9 +39,9 @@ typedef struct
 #pragma pack(pop)
 
 
-void create_header ( bmp_file_header *bmp, int version );
+void create_header ( bmp_file_header *bmp, int version ); //create hader
 
-void create_bmp ( char **pattern, char *name, int version );
+void create_bmp ( char **pattern, char *name, int version ); //create bmp file 
 
 
 

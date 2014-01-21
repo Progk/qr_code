@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define NUMBER_OF_SYMBOLS 2048
+#define NAME_OF_BMP_FILE 512
 #include <stdio.h>
 #include "code.h"
 
@@ -8,12 +9,12 @@
 int main()
 {
 	char input[NUMBER_OF_SYMBOLS];
-	char output[NUMBER_OF_SYMBOLS];
+	char output[NAME_OF_BMP_FILE];
 	
 	printf ( "%s", "QR Code Generator ( ASCII symbols only )" );
 	
 	printf ( "\n\n\n%s\n", "Enter string: " );
-		fgets ( &input[0], 1024, stdin );
+		fgets ( &input[0], NUMBER_OF_SYMBOLS, stdin );
 	
 	if ( strlen ( input ) != 1 )
 		input[strlen( input ) - 1] = '\0';
@@ -22,7 +23,7 @@ int main()
 
 	printf ( "\n%s\n", "Enter name of BMP file: " );
 
-	fgets ( &output[0], 1024, stdin );
+	fgets ( &output[0], NAME_OF_BMP_FILE, stdin );
 
 	if ( strlen ( output ) != 1 )
 		output[strlen( output ) - 1] = '\0';
@@ -34,9 +35,6 @@ int main()
 	printf( "\n%s", "QR Code was generated successful!" );
 
 	getchar();
-
-	//free ( &input[0] );
-	//free ( &output[0] );
 
 	return 0;
 

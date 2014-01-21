@@ -1,4 +1,4 @@
-﻿Build started 21.01.2014 0:26:09.
+﻿Build started 21.01.2014 21:02:06.
      1>Project "D:\Sergey\C\qr_code\qr_code_gen\qr_code_gen.vcxproj" on node 2 (rebuild target(s)).
      1>_PrepareForClean:
          Deleting file "Debug\qr_code_gen.lastbuildstate".
@@ -28,4 +28,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.53
+Time Elapsed 00:00:00.46

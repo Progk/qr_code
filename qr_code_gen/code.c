@@ -230,9 +230,9 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	int number = number_of_blocks[version];
 
 	col+=size_of_information[version];
-	col+=number_of_correction_byte[version]*8;
-	data = ( char* )calloc(col + 1, sizeof(char));
-	buf = ( char* )calloc(8 + 1, sizeof(char));
+	col+=number_of_correction_byte[version] * 8 * number;
+	data = ( char* )calloc(col + 1, sizeof(char) );
+	buf = ( char* )calloc(8 + 1, sizeof(char) );
 	data[col] = '\0';
 	data[8] = '\0';
 	size = (size_of_information[version] / 8) / number; //number byte in block

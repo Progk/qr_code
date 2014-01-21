@@ -35,7 +35,7 @@ void create_bmp ( char **pattern, char *name, int version )
 {
 	FILE *file;
 	bmp_file_header bmp;
-	char *data;
+	char *data_bmp;
 	char *buffer;
 	char *black;
 	char *white;
@@ -65,7 +65,7 @@ void create_bmp ( char **pattern, char *name, int version )
 	black = ( char* )calloc( 3, sizeof(char) );
 	white =( char* )calloc( 3, sizeof(char) );
 	memset( white, 255, 3 );
-	data = ( char* )calloc( bmp.image_data_length, sizeof(char) );
+	data_bmp = ( char* )calloc( bmp.image_data_length, sizeof(char) );
 	buffer = ( char* )calloc( size, sizeof(char) );
 	
 	var2 = bmp.image_data_length;
@@ -95,7 +95,7 @@ void create_bmp ( char **pattern, char *name, int version )
 		}
 		for ( k = 0; k < PIXEL_PER_MODUL; k++ )
 		{
-			memcpy ( &data[var2], buffer, size ); //add to end of array
+			memcpy ( &data_bmp[var2], buffer, size ); //add to end of array
 			var2-=size;
 		}
 	}
@@ -112,11 +112,11 @@ void create_bmp ( char **pattern, char *name, int version )
 		
 	file = fopen( output, "wb" );
 	fwrite( &bmp, sizeof(bmp), 1, file );
-	fwrite( data, bmp.image_data_length, 1, file );
+	fwrite( data_bmp, bmp.image_data_length, 1, file );
 	fclose(file);
 
 	free ( black );
 	free ( white );
 	free ( buffer );
-	free ( data );
+	free ( data_bmp );
 }

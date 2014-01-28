@@ -9,6 +9,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <math.h>
+#include <stdlib.h>
 #include "qr_table.h"
 
 typedef unsigned short WORD; 

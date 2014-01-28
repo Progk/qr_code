@@ -1,8 +1,6 @@
-﻿Build started 21.01.2014 21:02:06.
+﻿Build started 28.01.2014 13:24:35.
      1>Project "D:\Sergey\C\qr_code\qr_code_gen\qr_code_gen.vcxproj" on node 2 (rebuild target(s)).
-     1>_PrepareForClean:
-         Deleting file "Debug\qr_code_gen.lastbuildstate".
-       InitializeBuildStatus:
+     1>InitializeBuildStatus:
          Creating "Debug\qr_code_gen.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt code.c image.c main.c qr_table.c
@@ -10,8 +8,6 @@
          main.c
          image.c
          code.c
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(42): warning C4018: '<' : signed/unsigned mismatch
-     1>d:\sergey\c\qr_code\qr_code_gen\code.c(90): warning C4018: '>' : signed/unsigned mismatch
          Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Sergey\C\qr_code\Debug\qr_code_gen.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\qr_code_gen.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Sergey\C\qr_code\Debug\qr_code_gen.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Sergey\C\qr_code\Debug\qr_code_gen.lib" /MACHINE:X86 Debug\code.obj
@@ -28,4 +24,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.46
+Time Elapsed 00:00:00.66

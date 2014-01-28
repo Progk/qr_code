@@ -6,6 +6,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <math.h>
+#include <stdlib.h>
 #include "qr_table.h"
 #include "image.h"
 
@@ -15,7 +16,7 @@ int convert_to_int( char* str ); //convert binary code to int
 
 char* convert_to_utf8( char *str ); //convert int to utf8 binary
 
-int optimal_version ( int size ); //chosing optimal version
+int optimal_version ( int size ); //choosing optimal version
 
 char*  add_service_inf(char *str, int* ver); //service information and addition string to full size
 

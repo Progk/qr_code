@@ -64,10 +64,14 @@ void create_bmp ( char **pattern, char *name, int version )
 	
 	black = ( char* )calloc( 3, sizeof(char) );
 	white =( char* )calloc( 3, sizeof(char) );
-	memset( white, 255, 3 );
 	data_bmp = ( char* )calloc( bmp.image_data_length, sizeof(char) );
 	buffer = ( char* )calloc( size, sizeof(char) );
-	
+	if ( ( black == NULL ) || ( white == NULL ) || ( data_bmp == NULL ) || ( buffer == NULL ) )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
+	memset( white, 255, 3 );
 	var2 = bmp.image_data_length;
 	var2-=size;
 
@@ -106,11 +110,21 @@ void create_bmp ( char **pattern, char *name, int version )
 	if ( strcmp( end, ".bmp" ) != 0 )
 	{
 		output = ( char* )calloc( strlen( name ) + 4, sizeof ( char ) );
+		if ( output == NULL )
+		{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+		}
 		strcat( output, name );
 		strcat( output, ".bmp" );
 	}
 		
 	file = fopen( output, "wb" );
+	if ( file == NULL )
+		{
+		fprintf( stderr, "Can't open file\n" );
+		exit(1);
+		}
 	fwrite( &bmp, sizeof(bmp), 1, file );
 	fwrite( data_bmp, bmp.image_data_length, 1, file );
 	fclose(file);

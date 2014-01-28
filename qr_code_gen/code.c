@@ -5,6 +5,13 @@ char* convert_to_bin( unsigned int num, unsigned int bit ) //convert int to bina
 	char *str_bin;
 
 	str_bin = ( char* )calloc( bit + 1, sizeof( char ) ); //bin str 0-7 -  bit
+	
+	if ( str_bin == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
+
 	memset( str_bin, ( char )( ( int )'0' ), bit ); //initializing array
 	str_bin[bit] = '\0';
 
@@ -36,10 +43,18 @@ char* convert_to_utf8( char *str ) //convert int to utf8 binary
 {
 	int i;
 	char *str_bin;
+	int length;
 
 	str_bin = ( char* )calloc( strlen( str ) * 8 + 1, sizeof( char ) ); //for bin str
 
-	for ( i = 0; i < strlen( str ); i++ )
+	if ( str_bin == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
+
+	length = strlen( str );
+	for ( i = 0; i < length; i++ )
 		memcpy( str_bin + i * 8, convert_to_bin( str[i], 8 ), 8 * sizeof( char ) ); //copy binary code
 
 	str_bin[strlen( str ) * 8] = '\0'; //end of string
@@ -78,6 +93,7 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 	int zero;
 	int extra = 0; //extra byte
 	int buffer;
+	int length;
 	int i;
 	char *str_full;
 	char *zero_str;
@@ -86,8 +102,8 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 		data+=8;
 	else 
 		data+=16;
-
-	if ( ( strlen( str ) + data ) > ( size_of_information[*ver] ) ) //if big size
+	length = strlen( str );
+	if ( ( length + data ) > ( size_of_information[*ver] ) ) //if big size
 	{
 		( *ver )++;
 		data = 4;
@@ -99,6 +115,11 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 
 	zero = (strlen( str ) + data )%8; //number of zero until str%8 != 0
 	zero_str = ( char* )calloc( zero + 1, sizeof( char ) );
+	if ( zero_str == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
 	zero_str[zero] = '\0';
 	memset( zero_str, ( char )((int)'0'), zero ); //initializing array
 
@@ -107,6 +128,11 @@ char*  add_service_inf(char *str, int* ver) //service information and addition s
 		extra = -buffer/8; //number of extra byte
 
 	str_full = ( char* )calloc( strlen( str ) + data + zero + extra*8 + 1, sizeof(char) ); //new str full
+	if ( str_full == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
 	str_full[strlen( str ) + data + zero + extra*8] = '\0';
 	strcpy(str_full, "0100"); //add coding method
 	strcpy(&str_full[4], convert_to_bin(strlen( str ) / 8, data - 4 )); //add size of data
@@ -137,12 +163,23 @@ char** create_blocks( char *str, int version )
 	size = ( size_of_information[version] / 8 ) / number; //number byte in block
 	extra_size = ( size_of_information[version] / 8 ) % number; //extra byte
 	mas = ( char** )calloc( number, sizeof(char*) );
+	
+	if ( mas == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
 
 	for ( i = 0; i < number; i++ )
 	{
 		if ( ( i + extra_size ) != number )
 		{
 			mas[i] = ( char* )calloc( size * 8 + 1, sizeof(char) ); //without extra size
+			if ( mas[i] == NULL )
+				{
+					fprintf( stderr, "Can't allocate memory\n" );
+					exit(1);
+				}
 			memcpy( mas[i], &str[element], size * 8); 
 			mas[i][size * 8] = '\0';
 			element+=( size * 8 );
@@ -150,6 +187,11 @@ char** create_blocks( char *str, int version )
 		else
 		{
 			mas[i] = ( char* )calloc( (size + 1) * 8 + 1, sizeof(char) ); //with extra size
+			if ( mas[i] == NULL )
+				{
+					fprintf( stderr, "Can't allocate memory\n" );
+					exit(1);
+				}
 			memcpy( mas[i], &str[element], (size + 1) * 8); 
 			mas[i][(size + 1) * 8] = '\0';
 			element+=(size + 1) * 8;
@@ -175,6 +217,11 @@ int** create_correction_block( char **mas, int version ) //fix
 	char bin[8]; //array of byte
 
 	correction_blocks = ( int** )calloc( number_of_blocks[version], sizeof(int*) );
+	if ( correction_blocks == NULL )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
 	correction = number_of_correction_byte[version];
 
 	for ( i = 0; i < number_of_blocks[version]; i++ )
@@ -185,6 +232,11 @@ int** create_correction_block( char **mas, int version ) //fix
 		else
 			max = correction;
 		correction_blocks[i] = ( int* )calloc( max + 1, sizeof( int ) );
+		if ( correction_blocks[i] == NULL )
+		{
+			fprintf( stderr, "Can't allocate memory\n" );
+			exit(1);
+		}
 		correction_blocks[i][0] = correction; //element 0 is  correction size
 		for ( j = 1; j <= number; j++) // convert each byte to int
 		{
@@ -233,6 +285,11 @@ char* create_data ( char **blocks, int **cor_blocks, int version ) //up
 	col+=number_of_correction_byte[version] * 8 * number;
 	data = ( char* )calloc(col + 1, sizeof(char) );
 	buf = ( char* )calloc(8 + 1, sizeof(char) );
+	if ( ( data == NULL ) || ( buf == NULL ) )
+	{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+	}
 	data[col] = '\0';
 	data[8] = '\0';
 	size = (size_of_information[version] / 8) / number; //number byte in block
@@ -617,9 +674,20 @@ void add_data ( char **pattern, char *data, int version)
 		size+=8; //white border
 		pattern = ( char** )calloc( size, sizeof(char*) );
 
+		if ( pattern == NULL )
+		{
+		fprintf( stderr, "Can't allocate memory\n" );
+		exit(1);
+		}
+
 		for ( i = 0; i < size; i++)
 		{
 			pattern[i] = (char*)calloc(size, sizeof(char));
+			if ( pattern[i] == NULL )
+			{
+				fprintf( stderr, "Can't allocate memory\n" );
+				exit(1);
+			}
 			memset( pattern[i], (char)((int)'+'), size ); //initializing array
 		}
 

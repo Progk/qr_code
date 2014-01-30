@@ -61,7 +61,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code.c" />
+    <ClCompile Include="image.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="qr_table.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="qr_table.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

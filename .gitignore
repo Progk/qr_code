@@ -1,6 +1,7 @@
 # Object files
 *.o
 *.ko
+*.obj
 
 # Libraries
 *.lib
@@ -13,10 +14,42 @@
 *.dylib
 
 # Executables
-*.exe
 *.out
 *.app
 
 #Visual Studio
 *.sdf
 *.opensdf
+ipch/
+*.aps
+*.ncb
+*.cachefile
+Thumbs.db
+*.cache
+*.ilk
+*.pdb
+*.tmp
+*.ipch
+*.idb
+*.tlog
+*.log
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+
+# User
+*.bmp
+
+
